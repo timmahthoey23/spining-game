@@ -20,19 +20,11 @@
             overflow: hidden;
         }
 
-        /* =========================
-           MAIN APP
-        ========================= */
-
         .app {
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
-
-        /* =========================
-           HEADER
-        ========================= */
 
         .header {
             height: 70px;
@@ -70,10 +62,6 @@
             font-size: 14px;
         }
 
-        /* =========================
-           CHAT
-        ========================= */
-
         .chat {
             flex: 1;
             display: flex;
@@ -100,7 +88,6 @@
                 opacity: 0;
                 transform: translateY(5px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -118,6 +105,13 @@
             justify-content: center;
             font-weight: bold;
             font-size: 17px;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .message-content {
@@ -148,9 +142,13 @@
             white-space: pre-wrap;
         }
 
-        /* =========================
-           INPUT
-        ========================= */
+        .chat-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: block;
+        }
 
         .input-area {
             padding: 15px 20px 20px;
@@ -163,6 +161,21 @@
             gap: 10px;
             max-width: 1100px;
             margin: auto;
+            align-items: center;
+        }
+
+        .file-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .file-btn:hover {
+            background: #30363d;
         }
 
         #messageInput {
@@ -185,7 +198,7 @@
             background: #5865f2;
             color: white;
             border-radius: 10px;
-            padding: 0 22px;
+            padding: 14px 22px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
@@ -195,26 +208,50 @@
             background: #4752c4;
         }
 
-        #sendButton:active {
-            transform: scale(0.97);
+        .image-preview-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            background: #0d1117;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* =========================
-           USERNAME SCREEN
-        ========================= */
+        .image-preview-bar img {
+            height: 40px;
+            border-radius: 4px;
+        }
 
-        .username-screen {
+        .remove-img {
+            color: #f85149;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* MODAL OVERLAYS */
+        .modal-screen {
             position: fixed;
             inset: 0;
             background: rgba(13, 17, 23, 0.98);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 100;
             padding: 20px;
         }
 
-        .username-card {
+        #passwordScreen {
+            z-index: 101;
+        }
+
+        #usernameScreen {
+            z-index: 100;
+        }
+
+        .modal-card {
             width: 100%;
             max-width: 430px;
             background: #161b22;
@@ -224,34 +261,34 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
-        .username-card h2 {
+        .modal-card h2 {
             font-size: 26px;
             margin-bottom: 10px;
         }
 
-        .username-card p {
+        .modal-card p {
             color: #8b949e;
             line-height: 1.5;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
-        #usernameInput {
+        .modal-input {
             width: 100%;
             background: #0d1117;
             color: white;
             border: 1px solid #30363d;
             border-radius: 10px;
             padding: 14px;
-            font-size: 16px;
+            font-size: 15px;
             outline: none;
             margin-bottom: 12px;
         }
 
-        #usernameInput:focus {
+        .modal-input:focus {
             border-color: #5865f2;
         }
 
-        #usernameButton {
+        .modal-btn {
             width: 100%;
             border: none;
             background: #5865f2;
@@ -263,7 +300,7 @@
             cursor: pointer;
         }
 
-        #usernameButton:hover {
+        .modal-btn:hover {
             background: #4752c4;
         }
 
@@ -273,10 +310,6 @@
             margin-top: 10px;
             display: none;
         }
-
-        /* =========================
-           SCROLLBAR
-        ========================= */
 
         ::-webkit-scrollbar {
             width: 8px;
@@ -290,41 +323,6 @@
             background: #30363d;
             border-radius: 10px;
         }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        @media (max-width: 600px) {
-
-            .header {
-                padding: 0 15px;
-            }
-
-            .logo h1 {
-                font-size: 17px;
-            }
-
-            .messages {
-                padding: 15px;
-            }
-
-            .message-content {
-                max-width: 85%;
-            }
-
-            .input-area {
-                padding: 10px;
-            }
-
-            #sendButton {
-                padding: 0 16px;
-            }
-
-            .username-card {
-                padding: 25px;
-            }
-        }
     </style>
 </head>
 
@@ -332,104 +330,101 @@
 
 <div class="app">
 
-    <!-- HEADER -->
     <header class="header">
-
         <div class="logo">
             <div class="logo-icon">💬</div>
-
             <div>
                 <h1>Global Chat</h1>
             </div>
         </div>
-
         <div id="connectionStatus" class="online">
             ● Connecting...
         </div>
-
     </header>
 
-
-    <!-- CHAT -->
     <main class="chat">
-
-        <div id="messages" class="messages">
-            <!-- Messages appear here -->
-        </div>
+        <div id="messages" class="messages"></div>
 
         <div class="input-area">
+            <div id="previewBar" class="image-preview-bar">
+                <img id="imgPreview" src="" alt="Preview">
+                <span>Image attached</span>
+                <span id="removeImg" class="remove-img">✖</span>
+            </div>
 
             <form id="messageForm" class="input-box">
+                <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                <button type="button" id="uploadBtn" class="file-btn">📷</button>
 
                 <input
                     id="messageInput"
                     type="text"
                     maxlength="500"
-                    placeholder="Type a message..."
+                    placeholder="Type a message or paste an image..."
                     autocomplete="off"
                 >
 
-                <button id="sendButton" type="submit">
-                    Send
-                </button>
-
+                <button id="sendButton" type="submit">Send</button>
             </form>
-
         </div>
-
     </main>
 
 </div>
 
+<!-- PASSWORD SCREEN -->
+<div id="passwordScreen" class="modal-screen">
+    <div class="modal-card">
+        <h2>🔒 Access Restricted</h2>
+        <p>Enter the passcode to enter Global Chat.</p>
+
+        <input
+            id="passwordInput"
+            class="modal-input"
+            type="password"
+            placeholder="Enter site passcode..."
+            autocomplete="off"
+        >
+
+        <button id="passwordButton" class="modal-btn">Unlock Chat</button>
+
+        <div id="passwordError" class="error">
+            Incorrect passcode. Try again.
+        </div>
+    </div>
+</div>
 
 <!-- USERNAME SCREEN -->
-
-<div id="usernameScreen" class="username-screen">
-
-    <div class="username-card">
-
+<div id="usernameScreen" class="modal-screen">
+    <div class="modal-card">
         <h2>Welcome 👋</h2>
-
-        <p>
-            Choose a username to join the chat.
-            You don't need to create an account.
-            Your username will be remembered on this device.
-        </p>
+        <p>Choose a username and optional profile photo link to enter.</p>
 
         <input
             id="usernameInput"
+            class="modal-input"
             type="text"
             maxlength="20"
             placeholder="Enter username..."
             autocomplete="off"
         >
 
-        <button id="usernameButton">
-            Enter Chat
-        </button>
+        <input
+            id="avatarInput"
+            class="modal-input"
+            type="text"
+            placeholder="Profile Picture URL (optional)..."
+            autocomplete="off"
+        >
+
+        <button id="usernameButton" class="modal-btn">Enter Chat</button>
 
         <div id="usernameError" class="error">
             Please enter a username.
         </div>
-
     </div>
-
 </div>
 
-
-<!-- FIREBASE -->
-
 <script type="module">
-
-    /*
-    ==========================================================
-    FIREBASE CONFIG
-    ==========================================================
-
-    REPLACE THESE VALUES WITH YOUR FIREBASE PROJECT DETAILS.
-    ==========================================================
-    */
-
     import { initializeApp }
         from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
@@ -444,346 +439,237 @@
     }
         from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
-
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyByPBJqGxTb75hD9Gd6p0iTjCxncHifsMI",
-  authDomain: "spinnertest-57155.firebaseapp.com",
-  databaseURL: "https://spinnertest-57155-default-rtdb.firebaseio.com",
-  projectId: "spinnertest-57155",
-  storageBucket: "spinnertest-57155.firebasestorage.app",
-  messagingSenderId: "715577503355",
-  appId: "1:715577503355:web:05b677f1b551c070b87cde",
-  measurementId: "G-ZSXCZH5SCE"
-};
-
-
-    /*
-    ==========================================================
-    START FIREBASE
-    ==========================================================
-    */
+    const firebaseConfig = {
+      apiKey: "AIzaSyByPBJqGxTb75hD9Gd6p0iTjCxncHifsMI",
+      authDomain: "spinnertest-57155.firebaseapp.com",
+      databaseURL: "https://spinnertest-57155-default-rtdb.firebaseio.com",
+      projectId: "spinnertest-57155",
+      storageBucket: "spinnertest-57155.firebasestorage.app",
+      messagingSenderId: "715577503355",
+      appId: "1:715577503355:web:05b677f1b551c070b87cde",
+      measurementId: "G-ZSXCZH5SCE"
+    };
 
     const app = initializeApp(firebaseConfig);
-
     const database = getDatabase(app);
-
     const messagesRef = ref(database, "messages");
 
+    // SHA-256 HASH OF "1234"
+    const TARGET_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
 
-    /*
-    ==========================================================
-    USERNAME
-    ==========================================================
-    */
+    const passwordScreen = document.getElementById("passwordScreen");
+    const passwordInput = document.getElementById("passwordInput");
+    const passwordButton = document.getElementById("passwordButton");
+    const passwordError = document.getElementById("passwordError");
 
-    const usernameScreen =
-        document.getElementById("usernameScreen");
+    const usernameScreen = document.getElementById("usernameScreen");
+    const usernameInput = document.getElementById("usernameInput");
+    const avatarInput = document.getElementById("avatarInput");
+    const usernameButton = document.getElementById("usernameButton");
+    const usernameError = document.getElementById("usernameError");
 
-    const usernameInput =
-        document.getElementById("usernameInput");
+    let username = localStorage.getItem("chatUsername");
+    let userAvatar = localStorage.getItem("chatAvatar");
+    let attachedImageBase64 = null;
 
-    const usernameButton =
-        document.getElementById("usernameButton");
+    // PASSWORD VERIFICATION
+    passwordButton.addEventListener("click", checkPassword);
+    passwordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkPassword(); });
 
-    const usernameError =
-        document.getElementById("usernameError");
+    async function hashInput(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
+    async function checkPassword() {
+        const inputVal = passwordInput.value;
+        const inputHash = await hashInput(inputVal);
 
-    let username =
-        localStorage.getItem("chatUsername");
-
-
-    /*
-    If username already exists,
-    skip username screen.
-    */
+        if (inputHash === TARGET_HASH) {
+            passwordScreen.style.display = "none";
+            if (!username) {
+                usernameScreen.style.display = "flex";
+            }
+        } else {
+            passwordError.style.display = "block";
+        }
+    }
 
     if (username) {
-
         usernameScreen.style.display = "none";
-
     }
-
 
     usernameButton.addEventListener("click", setUsername);
-
-
-    usernameInput.addEventListener("keydown", function(event) {
-
-        if (event.key === "Enter") {
-
-            setUsername();
-
-        }
-
-    });
-
+    usernameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") setUsername(); });
 
     function setUsername() {
-
-        const name =
-            usernameInput.value.trim();
-
+        const name = usernameInput.value.trim();
+        const avatar = avatarInput.value.trim();
 
         if (!name) {
-
             usernameError.style.display = "block";
-
             return;
-
         }
 
+        username = name.substring(0, 20);
+        userAvatar = avatar || "";
 
-        if (name.length < 2) {
-
-            usernameError.textContent =
-                "Username must be at least 2 characters.";
-
-            usernameError.style.display = "block";
-
-            return;
-
-        }
-
-
-        username =
-            name.substring(0, 20);
-
-
-        localStorage.setItem(
-            "chatUsername",
-            username
-        );
-
+        localStorage.setItem("chatUsername", username);
+        localStorage.setItem("chatAvatar", userAvatar);
 
         usernameScreen.style.display = "none";
-
     }
 
+    const messages = document.getElementById("messages");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const messageInput = document.getElementById("messageInput");
+    const messageForm = document.getElementById("messageForm");
+    const fileInput = document.getElementById("fileInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const previewBar = document.getElementById("previewBar");
+    const imgPreview = document.getElementById("imgPreview");
+    const removeImg = document.getElementById("removeImg");
 
-    /*
-    ==========================================================
-    CHAT ELEMENTS
-    ==========================================================
-    */
+    uploadBtn.addEventListener("click", () => fileInput.click());
 
-    const messages =
-        document.getElementById("messages");
-
-    const connectionStatus =
-        document.getElementById("connectionStatus");
-
-    const messageInput =
-        document.getElementById("messageInput");
-
-    const messageForm =
-        document.getElementById("messageForm");
-
-
-    /*
-    ==========================================================
-    SEND MESSAGE
-    ==========================================================
-    */
-
-    messageForm.addEventListener("submit", async function(event) {
-
-        event.preventDefault();
-
-
-        const text =
-            messageInput.value.trim();
-
-
-        if (!text) return;
-
-
-        if (!username) {
-
-            alert("Choose a username first.");
-
-            return;
-
-        }
-
-
-        try {
-
-            await push(messagesRef, {
-
-                username: username,
-
-                message: text,
-
-                timestamp: Date.now()
-
-            });
-
-
-            messageInput.value = "";
-
-            messageInput.focus();
-
-        }
-
-        catch (error) {
-
-            console.error(error);
-
-            alert(
-                "Message could not be sent. Check your Firebase settings."
-            );
-
-        }
-
+    fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) convertFileToBase64(file);
     });
 
+    messageInput.addEventListener("paste", (e) => {
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let item of items) {
+            if (item.type.indexOf("image") === 0) {
+                const blob = item.getAsFile();
+                convertFileToBase64(blob);
+            }
+        }
+    });
 
-    /*
-    ==========================================================
-    RECEIVE MESSAGES
-    ==========================================================
-    */
+    function convertFileToBase64(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            attachedImageBase64 = e.target.result;
+            imgPreview.src = attachedImageBase64;
+            previewBar.style.display = "flex";
+        };
+        reader.readAsDataURL(file);
+    }
 
-    const recentMessages =
-        query(
-            messagesRef,
-            orderByChild("timestamp"),
-            limitToLast(100)
-        );
+    removeImg.addEventListener("click", () => {
+        attachedImageBase64 = null;
+        previewBar.style.display = "none";
+        fileInput.value = "";
+    });
 
+    messageForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const text = messageInput.value.trim();
+        if (!text && !attachedImageBase64) return;
+        if (!username) return alert("Choose a username first.");
+
+        try {
+            await push(messagesRef, {
+                username: username,
+                avatar: userAvatar || "",
+                message: text,
+                image: attachedImageBase64 || "",
+                timestamp: Date.now()
+            });
+
+            messageInput.value = "";
+            attachedImageBase64 = null;
+            previewBar.style.display = "none";
+            fileInput.value = "";
+            messageInput.focus();
+
+        } catch (error) {
+            console.error(error);
+            alert("Message could not be sent. Check your Firebase settings.");
+        }
+    });
+
+    const recentMessages = query(
+        messagesRef,
+        orderByChild("timestamp"),
+        limitToLast(100)
+    );
 
     onChildAdded(
         recentMessages,
         function(snapshot) {
-
             connectionStatus.textContent = "● Connected";
             connectionStatus.style.color = "#3fb950";
-
-            const data =
-                snapshot.val();
-
-
-            displayMessage(data);
-
+            displayMessage(snapshot.val());
         },
         function(error) {
-
             console.error("Firebase error:", error);
-
             connectionStatus.textContent = "● Database error";
             connectionStatus.style.color = "#f85149";
-
         }
     );
 
-
-    /*
-    ==========================================================
-    DISPLAY MESSAGE
-    ==========================================================
-    */
-
     function displayMessage(data) {
-
-        const message =
-            document.createElement("div");
-
+        const message = document.createElement("div");
         message.className = "message";
 
-
-        const avatar =
-            document.createElement("div");
-
+        const avatar = document.createElement("div");
         avatar.className = "avatar";
 
+        if (data.avatar) {
+            const img = document.createElement("img");
+            img.src = data.avatar;
+            avatar.appendChild(img);
+        } else {
+            avatar.textContent = (data.username || "U").charAt(0).toUpperCase();
+        }
 
-        avatar.textContent =
-            data.username
-                .charAt(0)
-                .toUpperCase();
+        const content = document.createElement("div");
+        content.className = "message-content";
 
+        const top = document.createElement("div");
+        top.className = "message-top";
 
-        const content =
-            document.createElement("div");
+        const name = document.createElement("span");
+        name.className = "username";
+        name.textContent = data.username;
 
-        content.className =
-            "message-content";
-
-
-        const top =
-            document.createElement("div");
-
-        top.className =
-            "message-top";
-
-
-        const name =
-            document.createElement("span");
-
-        name.className =
-            "username";
-
-        name.textContent =
-            data.username;
-
-
-        const time =
-            document.createElement("span");
-
-        time.className =
-            "time";
-
-
-        const date =
-            new Date(data.timestamp);
-
-
-        time.textContent =
-            date.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-
-
-        const text =
-            document.createElement("div");
-
-        text.className =
-            "text";
-
-
-        /*
-        textContent is used instead of innerHTML
-        so users cannot inject HTML into messages.
-        */
-
-        text.textContent =
-            data.message;
-
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = new Date(data.timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
 
         top.appendChild(name);
-
         top.appendChild(time);
-
         content.appendChild(top);
 
-        content.appendChild(text);
+        if (data.message) {
+            const text = document.createElement("div");
+            text.className = "text";
+            text.textContent = data.message;
+            content.appendChild(text);
+        }
+
+        if (data.image) {
+            const img = document.createElement("img");
+            img.src = data.image;
+            img.className = "chat-image";
+            content.appendChild(img);
+        }
 
         message.appendChild(avatar);
-
         message.appendChild(content);
 
-
         messages.appendChild(message);
-
-
-        messages.scrollTop =
-            messages.scrollHeight;
-
+        messages.scrollTop = messages.scrollHeight;
     }
-
 </script>
 
 </body>
