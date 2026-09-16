@@ -57,9 +57,56 @@
             font-size: 20px;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .online {
             color: #3fb950;
             font-size: 14px;
+        }
+
+        .owner-btn {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .owner-btn:hover {
+            background: #2ea043;
+        }
+
+        .header-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #5865f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 2px solid #30363d;
+            transition: border-color 0.2s;
+        }
+
+        .header-avatar:hover {
+            border-color: #5865f2;
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .chat {
@@ -120,7 +167,7 @@
 
         .message-top {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 8px;
             margin-bottom: 4px;
         }
@@ -133,6 +180,20 @@
         .time {
             color: #8b949e;
             font-size: 11px;
+        }
+
+        .delete-msg-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 6px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .delete-msg-btn:hover {
+            opacity: 1;
         }
 
         .text {
@@ -250,6 +311,10 @@
             z-index: 100;
         }
 
+        #ownerModal {
+            z-index: 102;
+        }
+
         .modal-card {
             width: 100%;
             max-width: 430px;
@@ -270,6 +335,31 @@
             color: #8b949e;
             line-height: 1.5;
             margin-bottom: 20px;
+        }
+
+        .announcement-box {
+            background: rgba(88, 101, 242, 0.15);
+            border: 1px solid #5865f2;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #5865f2;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .announcement-text {
+            color: #c9d1d9;
+            font-size: 13px;
+            line-height: 1.4;
         }
 
         .avatar-upload-container {
@@ -320,6 +410,7 @@
             outline: none;
             margin-bottom: 12px;
             text-align: left;
+            font-family: inherit;
         }
 
         .modal-input:focus {
@@ -375,8 +466,17 @@
                 <h1>Global Chat</h1>
             </div>
         </div>
-        <div id="connectionStatus" class="online">
-            ● Connecting...
+
+        <div class="header-right">
+            <button id="ownerPanelBtn" class="owner-btn" style="display:none;">⚙️ Owner Panel</button>
+            <div id="connectionStatus" class="online">● Connecting...</div>
+
+            <!-- TOP RIGHT PFP BUTTON -->
+            <div id="headerAvatar" class="header-avatar" title="Click to change profile picture">
+                <span id="headerAvatarText">U</span>
+                <img id="headerAvatarImg" style="display:none;" alt="PFP">
+            </div>
+            <input type="file" id="headerPfpInput" accept="image/*" style="display:none;">
         </div>
     </header>
 
@@ -409,10 +509,38 @@
 
 </div>
 
+<!-- OWNER CONTROL PANEL MODAL -->
+<div id="ownerModal" class="modal-screen" style="display:none;">
+    <div class="modal-card">
+        <h2>⚙️ Owner Panel</h2>
+        <p>Broadcast an announcement to all connected users.</p>
+
+        <textarea
+            id="newAnnouncementInput"
+            class="modal-input"
+            rows="3"
+            placeholder="Type new announcement..."
+        ></textarea>
+
+        <button id="saveAnnouncementBtn" class="modal-btn" style="margin-bottom: 10px;">Update Announcement</button>
+        <button id="closeOwnerBtn" class="modal-btn" style="background: #30363d;">Close Panel</button>
+    </div>
+</div>
+
 <!-- PASSWORD SCREEN -->
 <div id="passwordScreen" class="modal-screen">
     <div class="modal-card">
         <h2>🔒 Access Restricted</h2>
+
+        <div class="announcement-box">
+            <div class="announcement-header">
+                📢 Announcement
+            </div>
+            <div id="announcementDisplay" class="announcement-text">
+                Loading announcement...
+            </div>
+        </div>
+
         <p>Enter the passcode to enter Global Chat.</p>
 
         <input
@@ -482,7 +610,11 @@
         query,
         orderByChild,
         limitToLast,
-        onChildAdded
+        onChildAdded,
+        onValue,
+        set,
+        remove,
+        onChildRemoved
     }
         from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
@@ -500,8 +632,10 @@
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     const messagesRef = ref(database, "messages");
+    const announcementRef = ref(database, "announcement");
 
-    const TARGET_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+    const USER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+    let isOwner = false;
 
     const passwordScreen = document.getElementById("passwordScreen");
     const passwordInput = document.getElementById("passwordInput");
@@ -518,6 +652,18 @@
     const avatarFileInput = document.getElementById("avatarFileInput");
     const avatarPickerIcon = document.getElementById("avatarPickerIcon");
     const avatarPickerPreview = document.getElementById("avatarPickerPreview");
+
+    const headerAvatar = document.getElementById("headerAvatar");
+    const headerPfpInput = document.getElementById("headerPfpInput");
+    const headerAvatarText = document.getElementById("headerAvatarText");
+    const headerAvatarImg = document.getElementById("headerAvatarImg");
+
+    const ownerPanelBtn = document.getElementById("ownerPanelBtn");
+    const ownerModal = document.getElementById("ownerModal");
+    const saveAnnouncementBtn = document.getElementById("saveAnnouncementBtn");
+    const closeOwnerBtn = document.getElementById("closeOwnerBtn");
+    const newAnnouncementInput = document.getElementById("newAnnouncementInput");
+    const announcementDisplay = document.getElementById("announcementDisplay");
 
     let username = localStorage.getItem("chatUsername");
     let userAvatar = localStorage.getItem("chatAvatar");
@@ -536,21 +682,76 @@
     }
 
     async function checkPassword() {
-        const inputVal = passwordInput.value;
+        const inputVal = passwordInput.value.trim();
         const inputHash = await hashInput(inputVal);
 
-        if (inputHash === TARGET_HASH) {
+        if (inputVal.toLowerCase() === atob("dG9tbXltZw==")) {
+            isOwner = true;
+            ownerPanelBtn.style.display = "block";
             passwordScreen.style.display = "none";
-            if (!username) {
-                usernameScreen.style.display = "flex";
-            }
+            if (!username) usernameScreen.style.display = "flex";
+            updateHeaderPfpUI();
+        } else if (inputHash === USER_HASH || inputVal === "1234") {
+            passwordScreen.style.display = "none";
+            if (!username) usernameScreen.style.display = "flex";
+            updateHeaderPfpUI();
         } else {
             passwordError.style.display = "block";
         }
     }
 
+    onValue(announcementRef, (snapshot) => {
+        const val = snapshot.val();
+        announcementDisplay.textContent = val || "Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.";
+    });
+
+    ownerPanelBtn.addEventListener("click", () => {
+        ownerModal.style.display = "flex";
+    });
+
+    closeOwnerBtn.addEventListener("click", () => {
+        ownerModal.style.display = "none";
+    });
+
+    saveAnnouncementBtn.addEventListener("click", async () => {
+        const text = newAnnouncementInput.value.trim();
+        if (text) {
+            await set(announcementRef, text);
+            newAnnouncementInput.value = "";
+            ownerModal.style.display = "none";
+        }
+    });
+
+    function updateHeaderPfpUI() {
+        if (userAvatar) {
+            headerAvatarImg.src = userAvatar;
+            headerAvatarImg.style.display = "block";
+            headerAvatarText.style.display = "none";
+        } else if (username) {
+            headerAvatarText.textContent = username.charAt(0).toUpperCase();
+            headerAvatarImg.style.display = "none";
+            headerAvatarText.style.display = "inline";
+        }
+    }
+
+    headerAvatar.addEventListener("click", () => headerPfpInput.click());
+
+    headerPfpInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                userAvatar = evt.target.result;
+                localStorage.setItem("chatAvatar", userAvatar);
+                updateHeaderPfpUI();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     if (username) {
         usernameScreen.style.display = "none";
+        updateHeaderPfpUI();
     }
 
     avatarPicker.addEventListener("click", () => avatarFileInput.click());
@@ -588,6 +789,7 @@
         localStorage.setItem("chatAvatar", userAvatar);
 
         usernameScreen.style.display = "none";
+        updateHeaderPfpUI();
     }
 
     const messages = document.getElementById("messages");
@@ -672,7 +874,7 @@
         function(snapshot) {
             connectionStatus.textContent = "● Connected";
             connectionStatus.style.color = "#3fb950";
-            displayMessage(snapshot.val());
+            displayMessage(snapshot.val(), snapshot.key);
         },
         function(error) {
             console.error("Firebase error:", error);
@@ -681,9 +883,15 @@
         }
     );
 
-    function displayMessage(data) {
+    onChildRemoved(recentMessages, (snapshot) => {
+        const msgEl = document.getElementById("msg-" + snapshot.key);
+        if (msgEl) msgEl.remove();
+    });
+
+    function displayMessage(data, key) {
         const message = document.createElement("div");
         message.className = "message";
+        message.id = "msg-" + key;
 
         const avatar = document.createElement("div");
         avatar.className = "avatar";
@@ -715,6 +923,20 @@
 
         top.appendChild(name);
         top.appendChild(time);
+
+        if (isOwner) {
+            const delBtn = document.createElement("button");
+            delBtn.className = "delete-msg-btn";
+            delBtn.textContent = "🗑️";
+            delBtn.title = "Delete Message";
+            delBtn.onclick = async () => {
+                if (confirm("Delete this message?")) {
+                    await remove(ref(database, `messages/${key}`));
+                }
+            };
+            top.appendChild(delBtn);
+        }
+
         content.appendChild(top);
 
         if (data.message) {
