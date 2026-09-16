@@ -232,7 +232,6 @@
             font-weight: bold;
         }
 
-        /* MODAL OVERLAYS */
         .modal-screen {
             position: fixed;
             inset: 0;
@@ -259,6 +258,7 @@
             border-radius: 18px;
             padding: 35px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
         }
 
         .modal-card h2 {
@@ -272,6 +272,69 @@
             margin-bottom: 20px;
         }
 
+        /* ANNOUNCEMENT BOX STYLING */
+        .announcement-box {
+            background: rgba(88, 101, 242, 0.15);
+            border: 1px solid #5865f2;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #5865f2;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .announcement-text {
+            color: #c9d1d9;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .avatar-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar-picker {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #0d1117;
+            border: 2px dashed #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            margin-bottom: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .avatar-picker:hover {
+            border-color: #5865f2;
+        }
+
+        .avatar-picker img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-picker-label {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
         .modal-input {
             width: 100%;
             background: #0d1117;
@@ -282,6 +345,7 @@
             font-size: 15px;
             outline: none;
             margin-bottom: 12px;
+            text-align: left;
         }
 
         .modal-input:focus {
@@ -375,6 +439,17 @@
 <div id="passwordScreen" class="modal-screen">
     <div class="modal-card">
         <h2>🔒 Access Restricted</h2>
+
+        <!-- EDIT YOUR ANNOUNCEMENT HERE -->
+        <div class="announcement-box">
+            <div class="announcement-header">
+                📢 Announcement
+            </div>
+            <div class="announcement-text">
+                Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.
+            </div>
+        </div>
+
         <p>Enter the passcode to enter Global Chat.</p>
 
         <input
@@ -397,7 +472,16 @@
 <div id="usernameScreen" class="modal-screen">
     <div class="modal-card">
         <h2>Welcome 👋</h2>
-        <p>Choose a username and optional profile photo link to enter.</p>
+        <p>Choose a username and tap the icon to upload a profile picture.</p>
+
+        <div class="avatar-upload-container">
+            <div id="avatarPicker" class="avatar-picker">
+                <span id="avatarPickerIcon" style="font-size: 26px;">📷</span>
+                <img id="avatarPickerPreview" style="display:none;" alt="Profile Preview">
+            </div>
+            <span class="avatar-picker-label">Upload Profile Picture (Optional)</span>
+            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+        </div>
 
         <input
             id="usernameInput"
@@ -412,7 +496,7 @@
             id="avatarInput"
             class="modal-input"
             type="text"
-            placeholder="Profile Picture URL (optional)..."
+            placeholder="Or paste Profile Picture URL..."
             autocomplete="off"
         >
 
@@ -454,7 +538,6 @@
     const database = getDatabase(app);
     const messagesRef = ref(database, "messages");
 
-    // SHA-256 HASH OF "1234"
     const TARGET_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
 
     const passwordScreen = document.getElementById("passwordScreen");
@@ -468,11 +551,16 @@
     const usernameButton = document.getElementById("usernameButton");
     const usernameError = document.getElementById("usernameError");
 
+    const avatarPicker = document.getElementById("avatarPicker");
+    const avatarFileInput = document.getElementById("avatarFileInput");
+    const avatarPickerIcon = document.getElementById("avatarPickerIcon");
+    const avatarPickerPreview = document.getElementById("avatarPickerPreview");
+
     let username = localStorage.getItem("chatUsername");
     let userAvatar = localStorage.getItem("chatAvatar");
+    let uploadedAvatarBase64 = "";
     let attachedImageBase64 = null;
 
-    // PASSWORD VERIFICATION
     passwordButton.addEventListener("click", checkPassword);
     passwordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkPassword(); });
 
@@ -502,12 +590,28 @@
         usernameScreen.style.display = "none";
     }
 
+    avatarPicker.addEventListener("click", () => avatarFileInput.click());
+
+    avatarFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                uploadedAvatarBase64 = evt.target.result;
+                avatarPickerPreview.src = uploadedAvatarBase64;
+                avatarPickerPreview.style.display = "block";
+                avatarPickerIcon.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     usernameButton.addEventListener("click", setUsername);
     usernameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") setUsername(); });
 
     function setUsername() {
         const name = usernameInput.value.trim();
-        const avatar = avatarInput.value.trim();
+        const urlAvatar = avatarInput.value.trim();
 
         if (!name) {
             usernameError.style.display = "block";
@@ -515,7 +619,7 @@
         }
 
         username = name.substring(0, 20);
-        userAvatar = avatar || "";
+        userAvatar = uploadedAvatarBase64 || urlAvatar || "";
 
         localStorage.setItem("chatUsername", username);
         localStorage.setItem("chatAvatar", userAvatar);
