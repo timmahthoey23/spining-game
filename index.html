@@ -83,30 +83,50 @@
             background: #2ea043;
         }
 
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 6px 12px 6px 6px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .profile-badge:hover {
+            border-color: #5865f2;
+            background: #30363d;
+        }
+
         .header-avatar {
-            width: 38px;
-            height: 38px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: #5865f2;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
+            font-size: 14px;
             overflow: hidden;
-            border: 2px solid #30363d;
-            transition: border-color 0.2s;
-        }
-
-        .header-avatar:hover {
-            border-color: #5865f2;
         }
 
         .header-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .header-username {
+            font-size: 14px;
+            font-weight: bold;
+            color: #c9d1d9;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .chat {
@@ -307,7 +327,7 @@
             z-index: 101;
         }
 
-        #usernameScreen {
+        #usernameScreen, #editProfileModal {
             z-index: 100;
         }
 
@@ -471,12 +491,14 @@
             <button id="ownerPanelBtn" class="owner-btn" style="display:none;">⚙️ Owner Panel</button>
             <div id="connectionStatus" class="online">● Connecting...</div>
 
-            <!-- TOP RIGHT PFP BUTTON -->
-            <div id="headerAvatar" class="header-avatar" title="Click to change profile picture">
-                <span id="headerAvatarText">U</span>
-                <img id="headerAvatarImg" style="display:none;" alt="PFP">
+            <!-- TOP RIGHT PROFILE BADGE (CLICKABLE TO EDIT PROFILE) -->
+            <div id="profileBadge" class="profile-badge" title="Click to edit profile">
+                <div id="headerAvatar" class="header-avatar">
+                    <span id="headerAvatarText">U</span>
+                    <img id="headerAvatarImg" style="display:none;" alt="PFP">
+                </div>
+                <span id="headerUsername" class="header-username">User</span>
             </div>
-            <input type="file" id="headerPfpInput" accept="image/*" style="display:none;">
         </div>
     </header>
 
@@ -527,6 +549,39 @@
     </div>
 </div>
 
+<!-- EDIT PROFILE MODAL (EDIT NAME & PFP ANYTIME) -->
+<div id="editProfileModal" class="modal-screen" style="display:none;">
+    <div class="modal-card">
+        <h2>✏️ Edit Profile</h2>
+        <p>Update your display name or profile picture.</p>
+
+        <div class="avatar-upload-container">
+            <div id="editAvatarPicker" class="avatar-picker">
+                <span id="editAvatarPickerIcon" style="font-size: 26px;">📷</span>
+                <img id="editAvatarPickerPreview" style="display:none;" alt="Profile Preview">
+            </div>
+            <span class="avatar-picker-label">Upload New Profile Picture</span>
+            <input type="file" id="editAvatarFileInput" accept="image/*" style="display:none;">
+        </div>
+
+        <input
+            id="editUsernameInput"
+            class="modal-input"
+            type="text"
+            maxlength="20"
+            placeholder="Enter new username..."
+            autocomplete="off"
+        >
+
+        <button id="saveProfileBtn" class="modal-btn" style="margin-bottom: 10px;">Save Changes</button>
+        <button id="cancelEditProfileBtn" class="modal-btn" style="background: #30363d;">Cancel</button>
+
+        <div id="editProfileError" class="error">
+            Username cannot be empty.
+        </div>
+    </div>
+</div>
+
 <!-- PASSWORD SCREEN -->
 <div id="passwordScreen" class="modal-screen">
     <div class="modal-card">
@@ -559,7 +614,7 @@
     </div>
 </div>
 
-<!-- USERNAME SCREEN -->
+<!-- FIRST-TIME USERNAME SCREEN -->
 <div id="usernameScreen" class="modal-screen">
     <div class="modal-card">
         <h2>Welcome 👋</h2>
@@ -653,10 +708,20 @@
     const avatarPickerIcon = document.getElementById("avatarPickerIcon");
     const avatarPickerPreview = document.getElementById("avatarPickerPreview");
 
-    const headerAvatar = document.getElementById("headerAvatar");
-    const headerPfpInput = document.getElementById("headerPfpInput");
+    const profileBadge = document.getElementById("profileBadge");
+    const headerUsername = document.getElementById("headerUsername");
     const headerAvatarText = document.getElementById("headerAvatarText");
     const headerAvatarImg = document.getElementById("headerAvatarImg");
+
+    const editProfileModal = document.getElementById("editProfileModal");
+    const editUsernameInput = document.getElementById("editUsernameInput");
+    const editAvatarPicker = document.getElementById("editAvatarPicker");
+    const editAvatarFileInput = document.getElementById("editAvatarFileInput");
+    const editAvatarPickerIcon = document.getElementById("editAvatarPickerIcon");
+    const editAvatarPickerPreview = document.getElementById("editAvatarPickerPreview");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const cancelEditProfileBtn = document.getElementById("cancelEditProfileBtn");
+    const editProfileError = document.getElementById("editProfileError");
 
     const ownerPanelBtn = document.getElementById("ownerPanelBtn");
     const ownerModal = document.getElementById("ownerModal");
@@ -668,6 +733,7 @@
     let username = localStorage.getItem("chatUsername");
     let userAvatar = localStorage.getItem("chatAvatar");
     let uploadedAvatarBase64 = "";
+    let editUploadedAvatarBase64 = "";
     let attachedImageBase64 = null;
 
     passwordButton.addEventListener("click", checkPassword);
@@ -690,11 +756,11 @@
             ownerPanelBtn.style.display = "block";
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
-            updateHeaderPfpUI();
+            updateProfileUI();
         } else if (inputHash === USER_HASH || inputVal === "1234") {
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
-            updateHeaderPfpUI();
+            updateProfileUI();
         } else {
             passwordError.style.display = "block";
         }
@@ -705,13 +771,8 @@
         announcementDisplay.textContent = val || "Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.";
     });
 
-    ownerPanelBtn.addEventListener("click", () => {
-        ownerModal.style.display = "flex";
-    });
-
-    closeOwnerBtn.addEventListener("click", () => {
-        ownerModal.style.display = "none";
-    });
+    ownerPanelBtn.addEventListener("click", () => { ownerModal.style.display = "flex"; });
+    closeOwnerBtn.addEventListener("click", () => { ownerModal.style.display = "none"; });
 
     saveAnnouncementBtn.addEventListener("click", async () => {
         const text = newAnnouncementInput.value.trim();
@@ -722,7 +783,9 @@
         }
     });
 
-    function updateHeaderPfpUI() {
+    function updateProfileUI() {
+        headerUsername.textContent = username || "User";
+
         if (userAvatar) {
             headerAvatarImg.src = userAvatar;
             headerAvatarImg.style.display = "block";
@@ -734,24 +797,64 @@
         }
     }
 
-    headerAvatar.addEventListener("click", () => headerPfpInput.click());
+    profileBadge.addEventListener("click", () => {
+        editUsernameInput.value = username || "";
+        editUploadedAvatarBase64 = userAvatar || "";
 
-    headerPfpInput.addEventListener("change", (e) => {
+        if (userAvatar) {
+            editAvatarPickerPreview.src = userAvatar;
+            editAvatarPickerPreview.style.display = "block";
+            editAvatarPickerIcon.style.display = "none";
+        } else {
+            editAvatarPickerPreview.style.display = "none";
+            editAvatarPickerIcon.style.display = "block";
+        }
+
+        editProfileModal.style.display = "flex";
+    });
+
+    editAvatarPicker.addEventListener("click", () => editAvatarFileInput.click());
+
+    editAvatarFileInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(evt) {
-                userAvatar = evt.target.result;
-                localStorage.setItem("chatAvatar", userAvatar);
-                updateHeaderPfpUI();
+                editUploadedAvatarBase64 = evt.target.result;
+                editAvatarPickerPreview.src = editUploadedAvatarBase64;
+                editAvatarPickerPreview.style.display = "block";
+                editAvatarPickerIcon.style.display = "none";
             };
             reader.readAsDataURL(file);
         }
     });
 
+    cancelEditProfileBtn.addEventListener("click", () => {
+        editProfileModal.style.display = "none";
+        editProfileError.style.display = "none";
+    });
+
+    saveProfileBtn.addEventListener("click", () => {
+        const newName = editUsernameInput.value.trim();
+        if (!newName) {
+            editProfileError.style.display = "block";
+            return;
+        }
+
+        username = newName.substring(0, 20);
+        userAvatar = editUploadedAvatarBase64;
+
+        localStorage.setItem("chatUsername", username);
+        localStorage.setItem("chatAvatar", userAvatar);
+
+        updateProfileUI();
+        editProfileModal.style.display = "none";
+        editProfileError.style.display = "none";
+    });
+
     if (username) {
         usernameScreen.style.display = "none";
-        updateHeaderPfpUI();
+        updateProfileUI();
     }
 
     avatarPicker.addEventListener("click", () => avatarFileInput.click());
@@ -789,7 +892,7 @@
         localStorage.setItem("chatAvatar", userAvatar);
 
         usernameScreen.style.display = "none";
-        updateHeaderPfpUI();
+        updateProfileUI();
     }
 
     const messages = document.getElementById("messages");
