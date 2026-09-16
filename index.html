@@ -3,272 +3,753 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Hub & Admin Platform</title>
+    <title>Global Chat</title>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: #c9d1d9; height: 100vh; overflow: hidden; }
-        
-        .app-container { display: flex; height: 100vh; width: 100vw; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        /* SIDEBAR */
-        .sidebar { width: 300px; background: #161b22; border-right: 1px solid #30363d; display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-header { padding: 16px 20px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-header h2 { font-size: 18px; color: #fff; font-weight: 700; }
-        .online-badge { font-size: 12px; color: #3fb950; font-weight: 600; background: rgba(63, 185, 80, 0.1); padding: 4px 8px; border-radius: 12px; }
-        
-        .chat-nav { flex: 1; overflow-y: auto; padding: 12px; }
-        .section-header { font-size: 11px; text-transform: uppercase; color: #8b949e; font-weight: 700; margin: 16px 8px 6px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.5px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: #8b949e; margin-bottom: 2px; }
-        .nav-item:hover, .nav-item.active { background: #21262d; color: #fff; }
-        .nav-item.admin-link { color: #f2994a; }
-        .nav-icon { width: 32px; height: 32px; border-radius: 50%; background: #30363d; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff; font-size: 13px; flex-shrink: 0; }
-        
-        .add-btn { background: none; border: none; color: #5865f2; cursor: pointer; font-size: 18px; font-weight: bold; line-height: 1; }
-        .add-btn:hover { color: #7983f5; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0d1117;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        .user-panel { padding: 12px 16px; background: #0d1117; border-top: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; }
-        .user-details { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #5865f2; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff; font-size: 14px; }
-        
-        /* CHAT VIEW */
-        .chat-viewport { flex: 1; display: flex; flex-direction: column; background: #0d1117; min-width: 0; position: relative; }
-        .chat-topbar { height: 60px; background: #161b22; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .chat-title { font-weight: 700; font-size: 16px; color: #fff; display: flex; align-items: center; gap: 10px; }
-        
-        .action-bar { display: flex; gap: 8px; align-items: center; }
-        .btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; padding: 8px 14px; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; }
-        .btn:hover { background: #30363d; color: #fff; }
-        .btn-primary { background: #5865f2; color: #fff; border: none; }
-        .btn-primary:hover { background: #4752c4; }
-        .btn-success { background: #238636; color: #fff; border: none; }
-        .btn-success:hover { background: #2ea043; }
-        .btn-danger { background: #da3633; color: #fff; border: none; }
-        .btn-danger:hover { background: #b62324; }
+        .app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-        .messages-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-        .msg-card { display: flex; gap: 12px; position: relative; group: hover; }
-        .msg-content { flex: 1; max-width: 85%; }
-        .msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-        .msg-username { font-weight: 600; color: #fff; font-size: 14px; }
-        .msg-time { font-size: 11px; color: #8b949e; }
-        .msg-body { font-size: 14px; line-height: 1.5; color: #e6edf3; word-break: break-word; white-space: pre-wrap; }
-        
-        .quote-box { background: #161b22; border-left: 3px solid #5865f2; padding: 6px 10px; font-size: 12px; border-radius: 4px; margin-bottom: 6px; color: #8b949e; }
-        
-        /* REACTIONS & CONTROLS */
-        .reaction-bar { display: flex; gap: 6px; margin-top: 6px; }
-        .reaction-chip { background: #21262d; border: 1px solid #30363d; border-radius: 12px; padding: 2px 8px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .reaction-chip:hover { border-color: #5865f2; }
-        .msg-actions { display: none; position: absolute; right: 0; top: -10px; background: #21262d; border: 1px solid #30363d; border-radius: 6px; padding: 2px; }
-        .msg-card:hover .msg-actions { display: flex; gap: 2px; }
+        .header {
+            height: 70px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
 
-        /* INPUT AREA */
-        .typing-bar { height: 22px; padding: 0 20px; font-size: 12px; color: #8b949e; font-style: italic; }
-        .chat-input-area { padding: 0 20px 20px; }
-        .input-box-wrapper { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 8px; }
-        .reply-banner { display: none; justify-content: space-between; align-items: center; background: #21262d; padding: 6px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 8px; }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        .input-form { display: flex; gap: 8px; align-items: center; }
-        .text-input { flex: 1; background: transparent; border: none; color: #fff; padding: 8px; outline: none; font-size: 14px; }
-        .rec-active { background: #da3633 !important; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #5865f2;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
 
-        /* MODERATION & OWNER PANEL */
-        .admin-panel { display: none; flex: 1; flex-direction: column; padding: 24px; overflow-y: auto; background: #0d1117; }
-        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
-        .admin-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 18px; }
-        .admin-card h4 { color: #fff; margin-bottom: 12px; font-size: 15px; }
+        .logo h1 {
+            font-size: 20px;
+        }
 
-        /* CALL OVERLAY */
-        .call-modal { position: fixed; inset: 0; background: rgba(13, 17, 23, 0.95); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 900px; }
-        .video-card { width: 100%; height: 260px; background: #161b22; border-radius: 12px; border: 1px solid #30363d; overflow: hidden; position: relative; }
-        .video-card video { width: 100%; height: 100%; object-fit: cover; }
-        .video-tag { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .call-toolbar { display: flex; gap: 16px; margin-top: 30px; }
-        .round-btn { width: 52px; height: 52px; border-radius: 50%; border: none; background: #21262d; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .round-btn.muted { background: #da3633; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-        /* MODAL POPUPS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); z-index: 200; display: none; align-items: center; justify-content: center; }
-        .modal-box { width: 100%; max-width: 420px; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; }
-        .modal-box h3 { margin-bottom: 16px; color: #fff; }
-        .field-input { width: 100%; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; outline: none; font-size: 14px; }
-        .field-input:focus { border-color: #5865f2; }
+        .online {
+            color: #3fb950;
+            font-size: 14px;
+        }
+
+        .owner-btn {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .owner-btn:hover {
+            background: #2ea043;
+        }
+
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 6px 12px 6px 6px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .profile-badge:hover {
+            border-color: #5865f2;
+            background: #30363d;
+        }
+
+        .header-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #5865f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            overflow: hidden;
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-username {
+            font-size: 14px;
+            font-weight: bold;
+            color: #c9d1d9;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            animation: appear 0.2s ease;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 50%;
+            background: #5865f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 17px;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-content {
+            max-width: 75%;
+        }
+
+        .message-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .time {
+            color: #8b949e;
+            font-size: 11px;
+        }
+
+        .delete-msg-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 6px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .delete-msg-btn:hover {
+            opacity: 1;
+        }
+
+        .text {
+            color: #c9d1d9;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .chat-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .input-area {
+            padding: 15px 20px 20px;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 10px;
+            max-width: 1100px;
+            margin: auto;
+            align-items: center;
+        }
+
+        .file-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .file-btn:hover {
+            background: #30363d;
+        }
+
+        #messageInput {
+            flex: 1;
+            background: #0d1117;
+            color: white;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 14px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        #messageInput:focus {
+            border-color: #5865f2;
+        }
+
+        #sendButton {
+            border: none;
+            background: #5865f2;
+            color: white;
+            border-radius: 10px;
+            padding: 14px 22px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        #sendButton:hover {
+            background: #4752c4;
+        }
+
+        .image-preview-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            background: #0d1117;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .image-preview-bar img {
+            height: 40px;
+            border-radius: 4px;
+        }
+
+        .remove-img {
+            color: #f85149;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(13, 17, 23, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #passwordScreen {
+            z-index: 101;
+        }
+
+        #usernameScreen, #editProfileModal {
+            z-index: 100;
+        }
+
+        #ownerModal {
+            z-index: 102;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 430px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .owner-card {
+            max-width: 700px !important;
+            text-align: left;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-card h2 {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .modal-card p {
+            color: #8b949e;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .announcement-box {
+            background: rgba(88, 101, 242, 0.15);
+            border: 1px solid #5865f2;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #5865f2;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .announcement-text {
+            color: #c9d1d9;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .avatar-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar-picker {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #0d1117;
+            border: 2px dashed #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            margin-bottom: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .avatar-picker:hover {
+            border-color: #5865f2;
+        }
+
+        .avatar-picker img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-picker-label {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: #0d1117;
+            color: white;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 12px;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .modal-input:focus {
+            border-color: #5865f2;
+        }
+
+        .modal-btn {
+            width: 100%;
+            border: none;
+            background: #5865f2;
+            color: white;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-btn:hover {
+            background: #4752c4;
+        }
+
+        .danger-btn {
+            background: #da3633;
+        }
+
+        .danger-btn:hover {
+            background: #f85149;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .user-table th, .user-table td {
+            padding: 10px;
+            border: 1px solid #30363d;
+            text-align: left;
+        }
+
+        .user-table th {
+            background: #21262d;
+            color: #8b949e;
+        }
+
+        .ban-btn {
+            background: #da3633;
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .unban-btn {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #f85149;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 10px;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="app-container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>💬 Platform</h2>
-            <span id="onlineBadge" class="online-badge">● 1 Online</span>
-        </div>
+<div class="app">
 
-        <div class="chat-nav">
-            <div class="section-header">Main Channels</div>
-            <div id="nav-global" class="nav-item active" onclick="switchView('chat', 'global', 'Global Public Chat')">
-                <div class="nav-icon">#</div>
-                <span>Global Chat</span>
-            </div>
-
-            <div class="section-header">
-                Direct Messages
-                <button class="add-btn" onclick="showModal('dmModal')" title="New DM">+</button>
-            </div>
-            <div id="dmContainer"></div>
-
-            <div class="section-header">
-                Group Chats
-                <button class="add-btn" onclick="showModal('gcModal')" title="New Group">+</button>
-            </div>
-            <div id="gcContainer"></div>
-
-            <div class="section-header">Management</div>
-            <div class="nav-item admin-link" onclick="switchView('admin', 'admin', 'Owner & Admin Panel')">
-                <div class="nav-icon" style="background:#f2994a;">🛡️</div>
-                <span>Admin Panel</span>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">💬</div>
+            <div>
+                <h1>Global Chat</h1>
             </div>
         </div>
 
-        <div class="user-panel">
-            <div class="user-details" onclick="showModal('profileModal')">
-                <div id="myAvatar" class="user-avatar">U</div>
-                <div>
-                    <div id="myDisplayUsername" style="font-weight: 600; font-size: 13px; color: #fff;">User</div>
-                    <div style="font-size: 11px; color: #8b949e;">Settings & Profile</div>
+        <div class="header-right">
+            <button id="ownerPanelBtn" class="owner-btn" style="display:none;">⚙️ Owner Panel</button>
+            <div id="connectionStatus" class="online">● Connecting...</div>
+
+            <div id="profileBadge" class="profile-badge" title="Click to edit profile">
+                <div id="headerAvatar" class="header-avatar">
+                    <span id="headerAvatarText">U</span>
+                    <img id="headerAvatarImg" style="display:none;" alt="PFP">
                 </div>
+                <span id="headerUsername" class="header-username">User</span>
             </div>
-            <button id="notifBtn" class="btn" onclick="toggleNotifications()" title="Notifications">🔔</button>
         </div>
-    </aside>
+    </header>
 
-    <!-- CHAT VIEWPORT -->
-    <main id="chatViewport" class="chat-viewport">
-        <header class="chat-topbar">
-            <div id="activeTitle" class="chat-title"># Global Chat</div>
-            <div class="action-bar">
-                <button class="btn btn-success" onclick="initiateCall(true)">📹 Video</button>
-                <button class="btn btn-primary" onclick="initiateCall(false)">📞 Audio</button>
+    <main class="chat">
+        <div id="messages" class="messages"></div>
+
+        <div class="input-area">
+            <div id="previewBar" class="image-preview-bar">
+                <img id="imgPreview" src="" alt="Preview">
+                <span>Image attached</span>
+                <span id="removeImg" class="remove-img">✖</span>
             </div>
-        </header>
 
-        <div id="messagesList" class="messages-container"></div>
+            <form id="messageForm" class="input-box">
+                <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                <button type="button" id="uploadBtn" class="file-btn">📷</button>
 
-        <div id="typingIndicator" class="typing-bar"></div>
+                <input
+                    id="messageInput"
+                    type="text"
+                    maxlength="500"
+                    placeholder="Type a message or paste an image..."
+                    autocomplete="off"
+                >
 
-        <div class="chat-input-area">
-            <div class="input-box-wrapper">
-                <div id="replyBanner" class="reply-banner">
-                    <span id="replyBannerText">Replying...</span>
-                    <span style="cursor:pointer; color:#f85149;" onclick="cancelReply()">✖</span>
-                </div>
-
-                <form id="chatForm" class="input-form">
-                    <input type="file" id="fileUpload" accept="image/*" style="display:none;">
-                    <button type="button" class="btn" onclick="document.getElementById('fileUpload').click()">📷</button>
-                    <button type="button" id="voiceMicBtn" class="btn" onclick="toggleVoiceRecording()">🎙️</button>
-
-                    <input id="messageField" class="text-input" type="text" placeholder="Type a message..." autocomplete="off">
-                    <button type="submit" class="btn btn-primary">Send</button>
-                </form>
-            </div>
+                <button id="sendButton" type="submit">Send</button>
+            </form>
         </div>
     </main>
 
-    <!-- OWNER & ADMIN PANEL VIEW -->
-    <main id="adminViewport" class="admin-panel">
-        <h2 style="color:#fff; font-size: 22px;">🛡️ System Owner Controls</h2>
-        <p style="color:#8b949e; font-size: 13px; margin-top: 4px;">Manage platform settings, rate limits, slow mode, and moderation filters.</p>
+</div>
 
-        <div class="admin-grid">
-            <div class="admin-card">
-                <h4>⏱️ Slow Mode (Rate Limiting)</h4>
-                <p style="font-size: 12px; color: #8b949e; margin-bottom: 12px;">Enforce a cooldown delay between messages per user.</p>
-                <select id="slowModeSelect" class="field-input" onchange="updateSlowMode()">
-                    <option value="0">Disabled</option>
-                    <option value="3">3 Seconds</option>
-                    <option value="5">5 Seconds</option>
-                    <option value="10">10 Seconds</option>
-                </select>
+<!-- EXPANDED OWNER CONTROL PANEL -->
+<div id="ownerModal" class="modal-screen" style="display:none;">
+    <div class="modal-card owner-card">
+        <h2>⚙️ Owner Panel</h2>
+        <p>Manage announcements, user accounts, and room controls.</p>
+
+        <b style="color: #5865f2; font-size: 14px;">📢 Live Announcement</b>
+        <textarea
+            id="newAnnouncementInput"
+            class="modal-input"
+            rows="2"
+            placeholder="Type new announcement..."
+            style="margin-top: 8px;"
+        ></textarea>
+        <button id="saveAnnouncementBtn" class="modal-btn" style="margin-bottom: 20px;">Update Announcement</button>
+
+        <b style="color: #5865f2; font-size: 14px;">👥 Registered Accounts & Sessions</b>
+        <div style="overflow-x: auto;">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>IP Address</th>
+                        <th>Device / OS</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <b style="color: #f85149; font-size: 14px;">⚠️ Room Moderation</b>
+        <button id="clearChatBtn" class="modal-btn danger-btn" style="margin-top: 8px; margin-bottom: 12px;">🗑️ Clear Entire Chat History</button>
+
+        <button id="closeOwnerBtn" class="modal-btn" style="background: #30363d;">Close Panel</button>
+    </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div id="editProfileModal" class="modal-screen" style="display:none;">
+    <div class="modal-card">
+        <h2>✏️ Edit Profile</h2>
+        <p>Update your display name or profile picture.</p>
+
+        <div class="avatar-upload-container">
+            <div id="editAvatarPicker" class="avatar-picker">
+                <span id="editAvatarPickerIcon" style="font-size: 26px;">📷</span>
+                <img id="editAvatarPickerPreview" style="display:none;" alt="Profile Preview">
             </div>
+            <span class="avatar-picker-label">Upload New Profile Picture</span>
+            <input type="file" id="editAvatarFileInput" accept="image/*" style="display:none;">
+        </div>
 
-            <div class="admin-card">
-                <h4>🤬 Auto-Mod Profanity Filter</h4>
-                <p style="font-size: 12px; color: #8b949e; margin-bottom: 12px;">Automatically censor offensive words before broadcast.</p>
-                <button id="filterToggleBtn" class="btn btn-primary" onclick="toggleProfanityFilter()">Status: Enabled</button>
+        <input
+            id="editUsernameInput"
+            class="modal-input"
+            type="text"
+            maxlength="20"
+            placeholder="Enter new username..."
+            autocomplete="off"
+        >
+
+        <button id="saveProfileBtn" class="modal-btn" style="margin-bottom: 10px;">Save Changes</button>
+        <button id="cancelEditProfileBtn" class="modal-btn" style="background: #30363d;">Cancel</button>
+
+        <div id="editProfileError" class="error">
+            Username cannot be empty.
+        </div>
+    </div>
+</div>
+
+<!-- PASSWORD SCREEN -->
+<div id="passwordScreen" class="modal-screen">
+    <div class="modal-card">
+        <h2>🔒 Access Restricted</h2>
+
+        <div class="announcement-box">
+            <div class="announcement-header">
+                📢 Announcement
             </div>
-
-            <div class="admin-card">
-                <h4>🔇 Mute & Moderation Controls</h4>
-                <p style="font-size: 12px; color: #8b949e; margin-bottom: 12px;">Mute or ban user accounts by unique ID.</p>
-                <input id="modTargetId" class="field-input" placeholder="User ID...">
-                <div style="display:flex; gap: 8px;">
-                    <button class="btn btn-danger" onclick="applyMute()">Mute 10m</button>
-                    <button class="btn btn-danger" onclick="applyBan()">Ban User</button>
-                </div>
+            <div id="announcementDisplay" class="announcement-text">
+                Loading announcement...
             </div>
         </div>
-    </main>
-</div>
 
-<!-- CALL OVERLAY -->
-<div id="callOverlay" class="call-modal">
-    <div class="video-grid">
-        <div class="video-card">
-            <video id="localVideo" autoplay playsinline muted></video>
-            <div class="video-tag">You</div>
+        <p>Enter the passcode to enter Global Chat.</p>
+
+        <input
+            id="passwordInput"
+            class="modal-input"
+            type="password"
+            placeholder="Enter site passcode..."
+            autocomplete="off"
+        >
+
+        <button id="passwordButton" class="modal-btn">Unlock Chat</button>
+
+        <div id="passwordError" class="error">
+            Incorrect passcode. Try again.
         </div>
-        <div class="video-card">
-            <video id="remoteVideo" autoplay playsinline></video>
-            <div class="video-tag" id="remoteTag">Remote User</div>
+    </div>
+</div>
+
+<!-- FIRST-TIME USERNAME SCREEN -->
+<div id="usernameScreen" class="modal-screen">
+    <div class="modal-card">
+        <h2>Welcome 👋</h2>
+        <p>Choose a username and tap the icon to upload a profile picture.</p>
+
+        <div class="avatar-upload-container">
+            <div id="avatarPicker" class="avatar-picker">
+                <span id="avatarPickerIcon" style="font-size: 26px;">📷</span>
+                <img id="avatarPickerPreview" style="display:none;" alt="Profile Preview">
+            </div>
+            <span class="avatar-picker-label">Upload Profile Picture (Optional)</span>
+            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
         </div>
-    </div>
-    <div class="call-toolbar">
-        <button id="micToggleBtn" class="round-btn" onclick="toggleMic()">🎤</button>
-        <button id="camToggleBtn" class="round-btn" onclick="toggleCam()">📹</button>
-        <button class="round-btn" style="background:#da3633;" onclick="hangupCall()">📞</button>
-    </div>
-</div>
 
-<!-- DM MODAL -->
-<div id="dmModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>Start Direct Message</h3>
-        <input id="dmTargetInput" class="field-input" placeholder="Paste target User ID (UUID)...">
-        <button class="btn btn-primary" style="width:100%;" onclick="createDM()">Start Chat</button>
-        <button class="btn" style="width:100%; margin-top:8px;" onclick="hideModals()">Cancel</button>
-    </div>
-</div>
+        <input
+            id="usernameInput"
+            class="modal-input"
+            type="text"
+            maxlength="20"
+            placeholder="Enter username..."
+            autocomplete="off"
+        >
 
-<!-- GC MODAL -->
-<div id="gcModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>Create Group Chat</h3>
-        <input id="gcNameInput" class="field-input" placeholder="Group Name...">
-        <button class="btn btn-primary" style="width:100%;" onclick="createGroup()">Create Group</button>
-        <button class="btn" style="width:100%; margin-top:8px;" onclick="hideModals()">Cancel</button>
-    </div>
-</div>
+        <input
+            id="avatarInput"
+            class="modal-input"
+            type="text"
+            placeholder="Or paste Profile Picture URL..."
+            autocomplete="off"
+        >
 
-<!-- PROFILE MODAL -->
-<div id="profileModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>User Profile Settings</h3>
-        <label style="font-size:12px; color:#8b949e;">Display Name</label>
-        <input id="profileNameInput" class="field-input" style="margin-top:4px;" placeholder="Name...">
-        <label style="font-size:12px; color:#8b949e;">Unique Persistent User ID (Share to get DMs)</label>
-        <input id="myUserIdDisplay" class="field-input" style="margin-top:4px;" readonly>
-        <button class="btn btn-primary" style="width:100%;" onclick="saveProfile()">Save Settings</button>
-        <button class="btn" style="width:100%; margin-top:8px;" onclick="hideModals()">Close</button>
+        <button id="usernameButton" class="modal-btn">Enter Chat</button>
+
+        <div id="usernameError" class="error">
+            Please enter a username.
+        </div>
     </div>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, set, remove, onDisconnect, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+    import { initializeApp }
+        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+    import {
+        getDatabase,
+        ref,
+        push,
+        query,
+        orderByChild,
+        limitToLast,
+        onChildAdded,
+        onValue,
+        set,
+        remove,
+        onChildRemoved
+    }
+        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyByPBJqGxTb75hD9Gd6p0iTjCxncHifsMI",
@@ -277,312 +758,463 @@
       projectId: "spinnertest-57155",
       storageBucket: "spinnertest-57155.firebasestorage.app",
       messagingSenderId: "715577503355",
-      appId: "1:715577503355:web:05b677f1b551c070b87cde"
+      appId: "1:715577503355:web:05b677f1b551c070b87cde",
+      measurementId: "G-ZSXCZH5SCE"
     };
 
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
+    const messagesRef = ref(database, "messages");
+    const announcementRef = ref(database, "announcement");
+    const usersRef = ref(database, "users");
 
-    // Identity persistence
-    let myUserId = localStorage.getItem("app_user_id") || "usr_" + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem("app_user_id", myUserId);
-    let myUsername = localStorage.getItem("app_username") || "User_" + myUserId.substr(-4);
+    const USER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+    let isOwner = false;
+    let userIp = "Fetching...";
 
-    let activeChatId = "global";
-    let activeReply = null;
-    let pushNotifs = false;
-    let lastSentTime = 0;
-    let slowModeDelay = 0;
-    let profanityFilterActive = true;
+    fetch("https://api.ipify.org?format=json")
+        .then(res => res.json())
+        .then(data => userIp = data.ip)
+        .catch(() => userIp = "Unavailable");
 
-    const BANNED_WORDS = ["badword1", "badword2", "spam", "abuse"];
+    function getDeviceDetails() {
+        const ua = navigator.userAgent;
+        let os = "Unknown OS";
+        if (ua.includes("Win")) os = "Windows";
+        else if (ua.includes("Mac")) os = "MacOS";
+        else if (ua.includes("Linux")) os = "Linux";
+        else if (ua.includes("Android")) os = "Android";
+        else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
 
-    // User Presence tracking
-    const userRef = ref(database, `users/${myUserId}`);
-    onValue(ref(database, ".info/connected"), (snap) => {
+        let browser = "Unknown";
+        if (ua.includes("Chrome") && !ua.includes("Edg")) browser = "Chrome";
+        else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+        else if (ua.includes("Firefox")) browser = "Firefox";
+        else if (ua.includes("Edg")) browser = "Edge";
+
+        return `${os} (${browser})`;
+    }
+
+    const passwordScreen = document.getElementById("passwordScreen");
+    const passwordInput = document.getElementById("passwordInput");
+    const passwordButton = document.getElementById("passwordButton");
+    const passwordError = document.getElementById("passwordError");
+
+    const usernameScreen = document.getElementById("usernameScreen");
+    const usernameInput = document.getElementById("usernameInput");
+    const avatarInput = document.getElementById("avatarInput");
+    const usernameButton = document.getElementById("usernameButton");
+    const usernameError = document.getElementById("usernameError");
+
+    const avatarPicker = document.getElementById("avatarPicker");
+    const avatarFileInput = document.getElementById("avatarFileInput");
+    const avatarPickerIcon = document.getElementById("avatarPickerIcon");
+    const avatarPickerPreview = document.getElementById("avatarPickerPreview");
+
+    const profileBadge = document.getElementById("profileBadge");
+    const headerUsername = document.getElementById("headerUsername");
+    const headerAvatarText = document.getElementById("headerAvatarText");
+    const headerAvatarImg = document.getElementById("headerAvatarImg");
+
+    const editProfileModal = document.getElementById("editProfileModal");
+    const editUsernameInput = document.getElementById("editUsernameInput");
+    const editAvatarPicker = document.getElementById("editAvatarPicker");
+    const editAvatarFileInput = document.getElementById("editAvatarFileInput");
+    const editAvatarPickerIcon = document.getElementById("editAvatarPickerIcon");
+    const editAvatarPickerPreview = document.getElementById("editAvatarPickerPreview");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const cancelEditProfileBtn = document.getElementById("cancelEditProfileBtn");
+    const editProfileError = document.getElementById("editProfileError");
+
+    const ownerPanelBtn = document.getElementById("ownerPanelBtn");
+    const ownerModal = document.getElementById("ownerModal");
+    const saveAnnouncementBtn = document.getElementById("saveAnnouncementBtn");
+    const closeOwnerBtn = document.getElementById("closeOwnerBtn");
+    const clearChatBtn = document.getElementById("clearChatBtn");
+    const newAnnouncementInput = document.getElementById("newAnnouncementInput");
+    const announcementDisplay = document.getElementById("announcementDisplay");
+    const userTableBody = document.getElementById("userTableBody");
+
+    const messageForm = document.getElementById("messageForm");
+    const messageInput = document.getElementById("messageInput");
+    const messagesContainer = document.getElementById("messages");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const fileInput = document.getElementById("fileInput");
+    const previewBar = document.getElementById("previewBar");
+    const imgPreview = document.getElementById("imgPreview");
+    const removeImg = document.getElementById("removeImg");
+    const connectionStatus = document.getElementById("connectionStatus");
+
+    let username = localStorage.getItem("chatUsername");
+    let userAvatar = localStorage.getItem("chatAvatar");
+    let uploadedAvatarBase64 = "";
+    let editUploadedAvatarBase64 = "";
+    let attachedImageBase64 = null;
+
+    // Track Connection Status
+    const connectedRef = ref(database, ".info/connected");
+    onValue(connectedRef, (snap) => {
         if (snap.val() === true) {
-            onDisconnect(userRef).update({ online: false, lastActive: serverTimestamp() });
-            set(userRef, { username: myUsername, online: true, lastActive: serverTimestamp() });
-        }
-    });
-
-    onValue(ref(database, "users"), (snap) => {
-        const users = snap.val() || {};
-        let count = 0;
-        Object.values(users).forEach(u => { if (u?.online) count++; });
-        document.getElementById("onlineBadge").textContent = `● ${count} Online`;
-    });
-
-    // Slow Mode Listener
-    onValue(ref(database, "config/slowMode"), (snap) => {
-        slowModeDelay = snap.val() || 0;
-        document.getElementById("slowModeSelect").value = slowModeDelay;
-    });
-
-    // Navigation & View Switching
-    window.switchView = function(view, id, title) {
-        if (view === 'admin') {
-            document.getElementById("chatViewport").style.display = "none";
-            document.getElementById("adminViewport").style.display = "flex";
+            connectionStatus.textContent = "● Connected";
+            connectionStatus.style.color = "#3fb950";
         } else {
-            document.getElementById("adminViewport").style.display = "none";
-            document.getElementById("chatViewport").style.display = "flex";
-            activeChatId = id;
-            document.getElementById("activeTitle").textContent = (id === "global" ? "# " : "") + title;
-            listenToMessages();
-            listenToTyping();
+            connectionStatus.textContent = "● Disconnected";
+            connectionStatus.style.color = "#f85149";
         }
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    };
+    });
 
-    // Message Fetching & Rendering
-    function listenToMessages() {
-        onValue(ref(database, `messages/${activeChatId}`), (snap) => {
-            const list = document.getElementById("messagesList");
-            list.innerHTML = "";
-            const messages = snap.val() || {};
+    passwordButton.addEventListener("click", checkPassword);
+    passwordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkPassword(); });
 
-            Object.entries(messages).forEach(([id, msg]) => {
-                renderSingleMessage(id, msg);
-            });
-            list.scrollTop = list.scrollHeight;
+    async function hashInput(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function checkPassword() {
+        const inputVal = passwordInput.value.trim();
+        const inputHash = await hashInput(inputVal);
+
+        if (inputVal.toLowerCase() === atob("dG9tbXltZw==")) {
+            isOwner = true;
+            ownerPanelBtn.style.display = "block";
+            passwordScreen.style.display = "none";
+            if (!username) usernameScreen.style.display = "flex";
+            registerUserSession();
+            updateProfileUI();
+        } else if (inputHash === USER_HASH || inputVal === "1234") {
+            passwordScreen.style.display = "none";
+            if (!username) usernameScreen.style.display = "flex";
+            registerUserSession();
+            updateProfileUI();
+        } else {
+            passwordError.style.display = "block";
+        }
+    }
+
+    function registerUserSession() {
+        if (!username) return;
+        const safeKey = username.replace(/[.#$[\]]/g, "_");
+
+        onValue(ref(database, `users/${safeKey}/banned`), (snapshot) => {
+            if (snapshot.val() === true) {
+                alert("You have been banned from Global Chat.");
+                location.reload();
+            }
+        });
+
+        set(ref(database, `users/${safeKey}`), {
+            username: username,
+            ip: userIp,
+            device: getDeviceDetails(),
+            lastActive: Date.now()
         });
     }
 
-    function renderSingleMessage(id, msg) {
-        const list = document.getElementById("messagesList");
-        const card = document.createElement("div");
-        card.className = "msg-card";
+    onValue(announcementRef, (snapshot) => {
+        const val = snapshot.val();
+        announcementDisplay.textContent = val || "Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.";
+    });
 
-        let quote = msg.replyTo ? `<div class="quote-box"><b>${msg.replyTo.author}:</b> ${msg.replyTo.text}</div>` : '';
-        let media = msg.audio ? `<audio controls src="${msg.audio}" style="margin-top:6px; max-width:100%;"></audio>` : '';
-        if (msg.image) media += `<img src="${msg.image}" style="max-width:100%; max-height:240px; border-radius:8px; margin-top:6px; display:block;">`;
+    ownerPanelBtn.addEventListener("click", () => {
+        ownerModal.style.display = "flex";
+        loadUserTable();
+    });
 
-        let reactions = '';
-        if (msg.reactions) {
-            reactions = `<div class="reaction-bar">` + Object.entries(msg.reactions).map(([emoji, count]) => 
-                `<span class="reaction-chip" onclick="addReaction('${id}', '${emoji}')">${emoji} ${count}</span>`
-            ).join('') + `</div>`;
+    closeOwnerBtn.addEventListener("click", () => { ownerModal.style.display = "none"; });
+
+    saveAnnouncementBtn.addEventListener("click", async () => {
+        const text = newAnnouncementInput.value.trim();
+        if (text) {
+            await set(announcementRef, text);
+            newAnnouncementInput.value = "";
+            ownerModal.style.display = "none";
         }
+    });
 
-        card.innerHTML = `
-            <div class="user-avatar">${msg.username.charAt(0).toUpperCase()}</div>
-            <div class="msg-content">
-                <div class="msg-header">
-                    <span class="msg-username">${msg.username}</span>
-                    <span class="msg-time">${new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                </div>
-                ${quote}
-                ${msg.text ? `<div class="msg-body">${msg.text}</div>` : ''}
-                ${media}
-                ${reactions}
-            </div>
-            <div class="msg-actions">
-                <button class="btn" style="padding:2px 6px;" onclick="setReply('${msg.username}', '${msg.text || 'Media'}')">💬</button>
-                <button class="btn" style="padding:2px 6px;" onclick="addReaction('${id}', '👍')">👍</button>
-                <button class="btn" style="padding:2px 6px;" onclick="addReaction('${id}', '❤️')">❤️</button>
-            </div>
-        `;
-        list.appendChild(card);
+    clearChatBtn.addEventListener("click", async () => {
+        if (confirm("Are you sure you want to delete ALL messages?")) {
+            await set(messagesRef, null);
+            alert("Chat history cleared.");
+        }
+    });
+
+    function loadUserTable() {
+        onValue(usersRef, (snapshot) => {
+            const data = snapshot.val();
+            userTableBody.innerHTML = "";
+            if (!data) {
+                userTableBody.innerHTML = "<tr><td colspan='5'>No user logs found.</td></tr>";
+                return;
+            }
+
+            Object.keys(data).forEach(key => {
+                const user = data[key];
+                const tr = document.createElement("tr");
+
+                const isBanned = user.banned || false;
+                const statusHtml = isBanned ? "<span style='color:#f85149;'>Banned</span>" : "<span style='color:#3fb950;'>Active</span>";
+                const btnHtml = isBanned ?
+                    `<button class="unban-btn" onclick="toggleBan('${key}', false)">Unban</button>` :
+                    `<button class="ban-btn" onclick="toggleBan('${key}', true)">Ban</button>`;
+
+                tr.innerHTML = `
+                    <td><b>${user.username || key}</b></td>
+                    <td>${user.ip || 'Unknown'}</td>
+                    <td>${user.device || 'Unknown'}</td>
+                    <td>${statusHtml}</td>
+                    <td>${btnHtml}</td>
+                `;
+                userTableBody.appendChild(tr);
+            });
+        });
     }
 
-    // Message Sending & Slowmode Validation
-    document.getElementById("chatForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const now = Date.now();
-        if (slowModeDelay > 0 && (now - lastSentTime) < (slowModeDelay * 1000)) {
-            alert(`Slow mode is active. Please wait ${slowModeDelay} seconds between messages.`);
+    window.toggleBan = async (key, shouldBan) => {
+        await set(ref(database, `users/${key}/banned`), shouldBan);
+    };
+
+    function updateProfileUI() {
+        headerUsername.textContent = username || "User";
+
+        if (userAvatar) {
+            headerAvatarImg.src = userAvatar;
+            headerAvatarImg.style.display = "block";
+            headerAvatarText.style.display = "none";
+        } else if (username) {
+            headerAvatarText.textContent = username.charAt(0).toUpperCase();
+            headerAvatarImg.style.display = "none";
+            headerAvatarText.style.display = "inline";
+        }
+    }
+
+    profileBadge.addEventListener("click", () => {
+        editUsernameInput.value = username || "";
+        editUploadedAvatarBase64 = userAvatar || "";
+
+        if (userAvatar) {
+            editAvatarPickerPreview.src = userAvatar;
+            editAvatarPickerPreview.style.display = "block";
+            editAvatarPickerIcon.style.display = "none";
+        } else {
+            editAvatarPickerPreview.style.display = "none";
+            editAvatarPickerIcon.style.display = "block";
+        }
+
+        editProfileModal.style.display = "flex";
+    });
+
+    editAvatarPicker.addEventListener("click", () => editAvatarFileInput.click());
+
+    editAvatarFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                editUploadedAvatarBase64 = evt.target.result;
+                editAvatarPickerPreview.src = editUploadedAvatarBase64;
+                editAvatarPickerPreview.style.display = "block";
+                editAvatarPickerIcon.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    cancelEditProfileBtn.addEventListener("click", () => {
+        editProfileModal.style.display = "none";
+        editProfileError.style.display = "none";
+    });
+
+    saveProfileBtn.addEventListener("click", () => {
+        const newName = editUsernameInput.value.trim();
+        if (!newName) {
+            editProfileError.style.display = "block";
             return;
         }
 
-        const input = document.getElementById("messageField");
-        let text = input.value.trim();
-        if (!text) return;
+        username = newName.substring(0, 20);
+        userAvatar = editUploadedAvatarBase64;
 
-        if (profanityFilterActive) {
-            BANNED_WORDS.forEach(word => {
-                const reg = new RegExp(word, "gi");
-                text = text.replace(reg, "****");
-            });
-        }
+        localStorage.setItem("chatUsername", username);
+        localStorage.setItem("chatAvatar", userAvatar);
 
-        push(ref(database, `messages/${activeChatId}`), {
-            senderId: myUserId,
-            username: myUsername,
-            text: text,
-            replyTo: activeReply,
-            timestamp: serverTimestamp()
-        });
-
-        lastSentTime = now;
-        input.value = "";
-        cancelReply();
-        set(ref(database, `typing/${activeChatId}/${myUserId}`), null);
+        registerUserSession();
+        updateProfileUI();
+        editProfileModal.style.display = "none";
+        editProfileError.style.display = "none";
     });
 
-    window.addReaction = function(msgId, emoji) {
-        const reactRef = ref(database, `messages/${activeChatId}/${msgId}/reactions/${emoji}`);
-        onValue(reactRef, (snap) => {
-            const count = snap.val() || 0;
-            set(reactRef, count + 1);
-        }, { onlyOnce: true });
-    };
-
-    window.setReply = function(author, text) {
-        activeReply = { author, text };
-        document.getElementById("replyBannerText").textContent = `Replying to ${author}: "${text}"`;
-        document.getElementById("replyBanner").style.display = "flex";
-    };
-
-    window.cancelReply = function() {
-        activeReply = null;
-        document.getElementById("replyBanner").style.display = "none";
-    };
-
-    // Typing Indicators
-    document.getElementById("messageField").addEventListener("input", () => {
-        set(ref(database, `typing/${activeChatId}/${myUserId}`), myUsername);
-        setTimeout(() => set(ref(database, `typing/${activeChatId}/${myUserId}`), null), 2500);
-    });
-
-    function listenToTyping() {
-        onValue(ref(database, `typing/${activeChatId}`), (snap) => {
-            const typers = snap.val() || {};
-            const names = Object.entries(typers).filter(([id]) => id !== myUserId).map(([, name]) => name);
-            document.getElementById("typingIndicator").textContent = names.length ? `${names.join(", ")} is typing...` : "";
-        });
+    if (username) {
+        usernameScreen.style.display = "none";
+        updateProfileUI();
     }
 
-    // Voice Recorder
-    let mediaRecorder, chunks = [];
-    window.toggleVoiceRecording = async function() {
-        const btn = document.getElementById("voiceMicBtn");
-        if (mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-            btn.classList.remove("rec-active");
-        } else {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            chunks = [];
-            mediaRecorder.ondataavailable = e => chunks.push(e.data);
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(chunks, { type: 'audio/webm' });
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => {
-                    push(ref(database, `messages/${activeChatId}`), {
-                        senderId: myUserId,
-                        username: myUsername,
-                        audio: reader.result,
-                        timestamp: serverTimestamp()
-                    });
-                };
+    avatarPicker.addEventListener("click", () => avatarFileInput.click());
+
+    avatarFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                uploadedAvatarBase64 = evt.target.result;
+                avatarPickerPreview.src = uploadedAvatarBase64;
+                avatarPickerPreview.style.display = "block";
+                avatarPickerIcon.style.display = "none";
             };
-            mediaRecorder.start();
-            btn.classList.add("rec-active");
+            reader.readAsDataURL(file);
         }
-    };
+    });
 
-    // WebRTC Calls
-    let localStream, peerConn;
-    window.initiateCall = async function(video) {
-        document.getElementById("callOverlay").style.display = "flex";
-        localStream = await navigator.mediaDevices.getUserMedia({ video: video, audio: true });
-        document.getElementById("localVideo").srcObject = localStream;
+    usernameButton.addEventListener("click", setUsername);
+    usernameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") setUsername(); });
 
-        peerConn = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-        localStream.getTracks().forEach(t => peerConn.addTrack(t, localStream));
-        peerConn.ontrack = e => { document.getElementById("remoteVideo").srcObject = e.streams[0]; };
-    };
+    function setUsername() {
+        const name = usernameInput.value.trim();
+        const urlAvatar = avatarInput.value.trim();
 
-    window.toggleMic = () => {
-        const t = localStream.getAudioTracks()[0];
-        t.enabled = !t.enabled;
-        document.getElementById("micToggleBtn").classList.toggle("muted", !t.enabled);
-    };
-
-    window.toggleCam = () => {
-        const t = localStream.getVideoTracks()[0];
-        if (t) {
-            t.enabled = !t.enabled;
-            document.getElementById("camToggleBtn").classList.toggle("muted", !t.enabled);
+        if (!name) {
+            usernameError.style.display = "block";
+            return;
         }
-    };
 
-    window.hangupCall = () => {
-        if (localStream) localStream.getTracks().forEach(t => t.stop());
-        if (peerConn) peerConn.close();
-        document.getElementById("callOverlay").style.display = "none";
-    };
+        username = name.substring(0, 20);
+        userAvatar = uploadedAvatarBase64 || urlAvatar || "";
 
-    // Owner Moderation Handlers
-    window.updateSlowMode = () => {
-        const val = parseInt(document.getElementById("slowModeSelect").value);
-        set(ref(database, "config/slowMode"), val);
-    };
+        localStorage.setItem("chatUsername", username);
+        localStorage.setItem("chatAvatar", userAvatar);
 
-    window.toggleProfanityFilter = () => {
-        profanityFilterActive = !profanityFilterActive;
-        document.getElementById("filterToggleBtn").textContent = `Status: ${profanityFilterActive ? "Enabled" : "Disabled"}`;
-    };
-
-    // Modals
-    window.showModal = (id) => {
-        document.getElementById("profileNameInput").value = myUsername;
-        document.getElementById("myUserIdDisplay").value = myUserId;
-        document.getElementById(id).style.display = "flex";
-    };
-    window.hideModals = () => document.querySelectorAll(".modal-overlay").forEach(m => m.style.display = "none");
-
-    window.saveProfile = () => {
-        const name = document.getElementById("profileNameInput").value.trim();
-        if (name) {
-            myUsername = name;
-            localStorage.setItem("app_username", myUsername);
-            document.getElementById("myDisplayUsername").textContent = myUsername;
-            document.getElementById("myAvatar").textContent = myUsername.charAt(0).toUpperCase();
-            set(ref(database, `users/${myUserId}/username`), myUsername);
-        }
-        hideModals();
-    };
-
-    window.createDM = () => {
-        const target = document.getElementById("dmTargetInput").value.trim();
-        if (!target) return;
-        const id = [myUserId, target].sort().join("_");
-        appendNav('dmContainer', id, `DM (${target.substr(-4)})`);
-        switchView('chat', id, `Direct Message`);
-        hideModals();
-    };
-
-    window.createGroup = () => {
-        const name = document.getElementById("gcNameInput").value.trim();
-        if (!name) return;
-        const id = "group_" + Date.now();
-        appendNav('gcContainer', id, name);
-        switchView('chat', id, name);
-        hideModals();
-    };
-
-    function appendNav(containerId, id, label) {
-        const el = document.createElement("div");
-        el.className = "nav-item";
-        el.onclick = () => switchView('chat', id, label);
-        el.innerHTML = `<div class="nav-icon">${label.charAt(0)}</div><span>${label}</span>`;
-        document.getElementById(containerId).appendChild(el);
+        usernameScreen.style.display = "none";
+        registerUserSession();
+        updateProfileUI();
     }
 
-    window.toggleNotifications = () => {
-        Notification.requestPermission().then(perm => {
-            pushNotifs = perm === "granted";
-            document.getElementById("notifBtn").style.color = pushNotifs ? "#3fb950" : "#c9d1d9";
-        });
+    // Attachment & Image Handling
+    uploadBtn.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) handleImageFile(file);
+    });
+
+    messageInput.addEventListener("paste", (e) => {
+        const items = e.clipboardData.items;
+        for (let item of items) {
+            if (item.type.indexOf("image") !== -1) {
+                const file = item.getAsFile();
+                handleImageFile(file);
+            }
+        }
+    });
+
+    function handleImageFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            attachedImageBase64 = e.target.result;
+            imgPreview.src = attachedImageBase64;
+            previewBar.style.display = "flex";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    removeImg.addEventListener("click", () => {
+        attachedImageBase64 = null;
+        fileInput.value = "";
+        previewBar.style.display = "none";
+    });
+
+    // Chat Logic
+    messageForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const text = messageInput.value.trim();
+
+        if (!text && !attachedImageBase64) return;
+        if (!username) {
+            alert("Please set up a username first.");
+            return;
+        }
+
+        const msgData = {
+            username: username,
+            avatar: userAvatar || "",
+            text: text,
+            image: attachedImageBase64 || null,
+            timestamp: Date.now()
+        };
+
+        await push(messagesRef, msgData);
+
+        messageInput.value = "";
+        attachedImageBase64 = null;
+        fileInput.value = "";
+        previewBar.style.display = "none";
+    });
+
+    const recentMessagesQuery = query(messagesRef, limitToLast(100));
+
+    onChildAdded(recentMessagesQuery, (snapshot) => {
+        const key = snapshot.key;
+        const msg = snapshot.val();
+        renderMessage(key, msg);
+    });
+
+    onChildRemoved(messagesRef, (snapshot) => {
+        const key = snapshot.key;
+        const msgElem = document.getElementById(`msg-${key}`);
+        if (msgElem) msgElem.remove();
+    });
+
+    function renderMessage(key, msg) {
+        if (document.getElementById(`msg-${key}`)) return;
+
+        const div = document.createElement("div");
+        div.className = "message";
+        div.id = `msg-${key}`;
+
+        const initial = msg.username ? msg.username.charAt(0).toUpperCase() : "U";
+        const avatarHtml = msg.avatar
+            ? `<img src="${escapeHtml(msg.avatar)}" alt="PFP">`
+            : `<span>${initial}</span>`;
+
+        const formattedTime = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        const canDelete = isOwner || msg.username === username;
+        const deleteBtnHtml = canDelete
+            ? `<button class="delete-msg-btn" onclick="deleteMessage('${key}')">🗑️</button>`
+            : '';
+
+        const imageHtml = msg.image
+            ? `<img class="chat-image" src="${msg.image}" alt="Attached Image">`
+            : '';
+
+        div.innerHTML = `
+            <div class="avatar">${avatarHtml}</div>
+            <div class="message-content">
+                <div class="message-top">
+                    <span class="username">${escapeHtml(msg.username || "User")}</span>
+                    <span class="time">${formattedTime}</span>
+                    ${deleteBtnHtml}
+                </div>
+                ${msg.text ? `<div class="text">${escapeHtml(msg.text)}</div>` : ''}
+                ${imageHtml}
+            </div>
+        `;
+
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    window.deleteMessage = async (key) => {
+        await remove(ref(database, `messages/${key}`));
     };
 
-    // Initialize
-    document.getElementById("myDisplayUsername").textContent = myUsername;
-    document.getElementById("myAvatar").textContent = myUsername.charAt(0).toUpperCase();
-    switchView('chat', 'global', 'Global Chat');
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 </script>
 </body>
 </html>
