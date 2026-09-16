@@ -835,33 +835,11 @@
     const announcementDisplay = document.getElementById("announcementDisplay");
     const userTableBody = document.getElementById("userTableBody");
 
-    const messageForm = document.getElementById("messageForm");
-    const messageInput = document.getElementById("messageInput");
-    const messagesContainer = document.getElementById("messages");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const fileInput = document.getElementById("fileInput");
-    const previewBar = document.getElementById("previewBar");
-    const imgPreview = document.getElementById("imgPreview");
-    const removeImg = document.getElementById("removeImg");
-    const connectionStatus = document.getElementById("connectionStatus");
-
     let username = localStorage.getItem("chatUsername");
     let userAvatar = localStorage.getItem("chatAvatar");
     let uploadedAvatarBase64 = "";
     let editUploadedAvatarBase64 = "";
     let attachedImageBase64 = null;
-
-    // Track Connection Status
-    const connectedRef = ref(database, ".info/connected");
-    onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-            connectionStatus.textContent = "● Connected";
-            connectionStatus.style.color = "#3fb950";
-        } else {
-            connectionStatus.textContent = "● Disconnected";
-            connectionStatus.style.color = "#f85149";
-        }
-    });
 
     passwordButton.addEventListener("click", checkPassword);
     passwordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkPassword(); });
@@ -1091,25 +1069,34 @@
         updateProfileUI();
     }
 
-    // Attachment & Image Handling
+    const messages = document.getElementById("messages");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const messageInput = document.getElementById("messageInput");
+    const messageForm = document.getElementById("messageForm");
+    const fileInput = document.getElementById("fileInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const previewBar = document.getElementById("previewBar");
+    const imgPreview = document.getElementById("imgPreview");
+    const removeImg = document.getElementById("removeImg");
+
     uploadBtn.addEventListener("click", () => fileInput.click());
 
     fileInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
-        if (file) handleImageFile(file);
+        if (file) convertFileToBase64(file);
     });
 
     messageInput.addEventListener("paste", (e) => {
-        const items = e.clipboardData.items;
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (let item of items) {
-            if (item.type.indexOf("image") !== -1) {
-                const file = item.getAsFile();
-                handleImageFile(file);
+            if (item.type.indexOf("image") === 0) {
+                const blob = item.getAsFile();
+                convertFileToBase64(blob);
             }
         }
     });
 
-    function handleImageFile(file) {
+    function convertFileToBase64(file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             attachedImageBase64 = e.target.result;
@@ -1121,100 +1108,135 @@
 
     removeImg.addEventListener("click", () => {
         attachedImageBase64 = null;
-        fileInput.value = "";
         previewBar.style.display = "none";
+        fileInput.value = "";
     });
 
-    // Chat Logic
-    messageForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const text = messageInput.value.trim();
+    messageForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
 
+        const text = messageInput.value.trim();
         if (!text && !attachedImageBase64) return;
-        if (!username) {
-            alert("Please set up a username first.");
-            return;
+        if (!username) return alert("Choose a username first.");
+
+        try {
+            await push(messagesRef, {
+                username: username,
+                avatar: userAvatar || "",
+                message: text,
+                image: attachedImageBase64 || "",
+                timestamp: Date.now()
+            });
+
+            messageInput.value = "";
+            attachedImageBase64 = null;
+            previewBar.style.display = "none";
+            fileInput.value = "";
+            messageInput.focus();
+
+        } catch (error) {
+            console.error(error);
+            alert("Message could not be sent. Check your Firebase settings.");
+        }
+    });
+
+    const recentMessages = query(
+        messagesRef,
+        orderByChild("timestamp"),
+        limitToLast(100)
+    );
+
+    onChildAdded(
+        recentMessages,
+        function(snapshot) {
+            connectionStatus.textContent = "● Connected";
+            connectionStatus.style.color = "#3fb950";
+            displayMessage(snapshot.val(), snapshot.key);
+        },
+        function(error) {
+            console.error("Firebase error:", error);
+            connectionStatus.textContent = "● Database error";
+            connectionStatus.style.color = "#f85149";
+        }
+    );
+
+    onChildRemoved(recentMessages, (snapshot) => {
+        const msgEl = document.getElementById("msg-" + snapshot.key);
+        if (msgEl) msgEl.remove();
+    });
+
+    function displayMessage(data, key) {
+        const message = document.createElement("div");
+        message.className = "message";
+        message.id = "msg-" + key;
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+
+        if (data.avatar) {
+            const img = document.createElement("img");
+            img.src = data.avatar;
+            avatar.appendChild(img);
+        } else {
+            avatar.textContent = (data.username || "U").charAt(0).toUpperCase();
         }
 
-        const msgData = {
-            username: username,
-            avatar: userAvatar || "",
-            text: text,
-            image: attachedImageBase64 || null,
-            timestamp: Date.now()
-        };
+        const content = document.createElement("div");
+        content.className = "message-content";
 
-        await push(messagesRef, msgData);
+        const top = document.createElement("div");
+        top.className = "message-top";
 
-        messageInput.value = "";
-        attachedImageBase64 = null;
-        fileInput.value = "";
-        previewBar.style.display = "none";
-    });
+        const name = document.createElement("span");
+        name.className = "username";
+        name.textContent = data.username;
 
-    const recentMessagesQuery = query(messagesRef, limitToLast(100));
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = new Date(data.timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
 
-    onChildAdded(recentMessagesQuery, (snapshot) => {
-        const key = snapshot.key;
-        const msg = snapshot.val();
-        renderMessage(key, msg);
-    });
+        top.appendChild(name);
+        top.appendChild(time);
 
-    onChildRemoved(messagesRef, (snapshot) => {
-        const key = snapshot.key;
-        const msgElem = document.getElementById(`msg-${key}`);
-        if (msgElem) msgElem.remove();
-    });
+        if (isOwner) {
+            const delBtn = document.createElement("button");
+            delBtn.className = "delete-msg-btn";
+            delBtn.textContent = "🗑️";
+            delBtn.title = "Delete Message";
+            delBtn.onclick = async () => {
+                if (confirm("Delete this message?")) {
+                    await remove(ref(database, `messages/${key}`));
+                }
+            };
+            top.appendChild(delBtn);
+        }
 
-    function renderMessage(key, msg) {
-        if (document.getElementById(`msg-${key}`)) return;
+        content.appendChild(top);
 
-        const div = document.createElement("div");
-        div.className = "message";
-        div.id = `msg-${key}`;
+        if (data.message) {
+            const text = document.createElement("div");
+            text.className = "text";
+            text.textContent = data.message;
+            content.appendChild(text);
+        }
 
-        const initial = msg.username ? msg.username.charAt(0).toUpperCase() : "U";
-        const avatarHtml = msg.avatar
-            ? `<img src="${escapeHtml(msg.avatar)}" alt="PFP">`
-            : `<span>${initial}</span>`;
+        if (data.image) {
+            const img = document.createElement("img");
+            img.src = data.image;
+            img.className = "chat-image";
+            content.appendChild(img);
+        }
 
-        const formattedTime = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        message.appendChild(avatar);
+        message.appendChild(content);
 
-        const canDelete = isOwner || msg.username === username;
-        const deleteBtnHtml = canDelete
-            ? `<button class="delete-msg-btn" onclick="deleteMessage('${key}')">🗑️</button>`
-            : '';
-
-        const imageHtml = msg.image
-            ? `<img class="chat-image" src="${msg.image}" alt="Attached Image">`
-            : '';
-
-        div.innerHTML = `
-            <div class="avatar">${avatarHtml}</div>
-            <div class="message-content">
-                <div class="message-top">
-                    <span class="username">${escapeHtml(msg.username || "User")}</span>
-                    <span class="time">${formattedTime}</span>
-                    ${deleteBtnHtml}
-                </div>
-                ${msg.text ? `<div class="text">${escapeHtml(msg.text)}</div>` : ''}
-                ${imageHtml}
-            </div>
-        `;
-
-        messagesContainer.appendChild(div);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    window.deleteMessage = async (key) => {
-        await remove(ref(database, `messages/${key}`));
-    };
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        messages.appendChild(message);
+        messages.scrollTop = messages.scrollHeight;
     }
 </script>
+
 </body>
 </html>
