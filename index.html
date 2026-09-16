@@ -343,8 +343,8 @@
             </div>
         </div>
 
-        <div class="online">
-            ● Online
+        <div id="connectionStatus" class="online">
+            ● Connecting...
         </div>
 
     </header>
@@ -449,6 +449,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyByPBJqGxTb75hD9Gd6p0iTjCxncHifsMI",
   authDomain: "spinnertest-57155.firebaseapp.com",
+  databaseURL: "https://spinnertest-57155-default-rtdb.firebaseio.com",
   projectId: "spinnertest-57155",
   storageBucket: "spinnertest-57155.firebasestorage.app",
   messagingSenderId: "715577503355",
@@ -570,6 +571,9 @@ const firebaseConfig = {
     const messages =
         document.getElementById("messages");
 
+    const connectionStatus =
+        document.getElementById("connectionStatus");
+
     const messageInput =
         document.getElementById("messageInput");
 
@@ -654,6 +658,9 @@ const firebaseConfig = {
         recentMessages,
         function(snapshot) {
 
+            connectionStatus.textContent = "● Connected";
+            connectionStatus.style.color = "#3fb950";
+
             const data =
                 snapshot.val();
 
@@ -663,10 +670,10 @@ const firebaseConfig = {
         },
         function(error) {
 
-            console.error(
-                "Firebase error:",
-                error
-            );
+            console.error("Firebase error:", error);
+
+            connectionStatus.textContent = "● Database error";
+            connectionStatus.style.color = "#f85149";
 
         }
     );
