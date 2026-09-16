@@ -346,6 +346,13 @@
             text-align: center;
         }
 
+        .owner-card {
+            max-width: 700px !important;
+            text-align: left;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
         .modal-card h2 {
             font-size: 26px;
             margin-bottom: 10px;
@@ -453,6 +460,55 @@
             background: #4752c4;
         }
 
+        .danger-btn {
+            background: #da3633;
+        }
+
+        .danger-btn:hover {
+            background: #f85149;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .user-table th, .user-table td {
+            padding: 10px;
+            border: 1px solid #30363d;
+            text-align: left;
+        }
+
+        .user-table th {
+            background: #21262d;
+            color: #8b949e;
+        }
+
+        .ban-btn {
+            background: #da3633;
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .unban-btn {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
         .error {
             color: #f85149;
             font-size: 13px;
@@ -491,7 +547,6 @@
             <button id="ownerPanelBtn" class="owner-btn" style="display:none;">⚙️ Owner Panel</button>
             <div id="connectionStatus" class="online">● Connecting...</div>
 
-            <!-- TOP RIGHT PROFILE BADGE (CLICKABLE TO EDIT PROFILE) -->
             <div id="profileBadge" class="profile-badge" title="Click to edit profile">
                 <div id="headerAvatar" class="header-avatar">
                     <span id="headerAvatarText">U</span>
@@ -531,25 +586,48 @@
 
 </div>
 
-<!-- OWNER CONTROL PANEL MODAL -->
+<!-- EXPANDED OWNER CONTROL PANEL -->
 <div id="ownerModal" class="modal-screen" style="display:none;">
-    <div class="modal-card">
+    <div class="modal-card owner-card">
         <h2>⚙️ Owner Panel</h2>
-        <p>Broadcast an announcement to all connected users.</p>
+        <p>Manage announcements, user accounts, and room controls.</p>
 
+        <b style="color: #5865f2; font-size: 14px;">📢 Live Announcement</b>
         <textarea
             id="newAnnouncementInput"
             class="modal-input"
-            rows="3"
+            rows="2"
             placeholder="Type new announcement..."
+            style="margin-top: 8px;"
         ></textarea>
+        <button id="saveAnnouncementBtn" class="modal-btn" style="margin-bottom: 20px;">Update Announcement</button>
 
-        <button id="saveAnnouncementBtn" class="modal-btn" style="margin-bottom: 10px;">Update Announcement</button>
+        <b style="color: #5865f2; font-size: 14px;">👥 Registered Accounts & Sessions</b>
+        <div style="overflow-x: auto;">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>IP Address</th>
+                        <th>Device / OS</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <b style="color: #f85149; font-size: 14px;">⚠️ Room Moderation</b>
+        <button id="clearChatBtn" class="modal-btn danger-btn" style="margin-top: 8px; margin-bottom: 12px;">🗑️ Clear Entire Chat History</button>
+
         <button id="closeOwnerBtn" class="modal-btn" style="background: #30363d;">Close Panel</button>
     </div>
 </div>
 
-<!-- EDIT PROFILE MODAL (EDIT NAME & PFP ANYTIME) -->
+<!-- EDIT PROFILE MODAL -->
 <div id="editProfileModal" class="modal-screen" style="display:none;">
     <div class="modal-card">
         <h2>✏️ Edit Profile</h2>
@@ -688,9 +766,34 @@
     const database = getDatabase(app);
     const messagesRef = ref(database, "messages");
     const announcementRef = ref(database, "announcement");
+    const usersRef = ref(database, "users");
 
     const USER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
     let isOwner = false;
+    let userIp = "Fetching...";
+
+    fetch("https://api.ipify.org?format=json")
+        .then(res => res.json())
+        .then(data => userIp = data.ip)
+        .catch(() => userIp = "Unavailable");
+
+    function getDeviceDetails() {
+        const ua = navigator.userAgent;
+        let os = "Unknown OS";
+        if (ua.includes("Win")) os = "Windows";
+        else if (ua.includes("Mac")) os = "MacOS";
+        else if (ua.includes("Linux")) os = "Linux";
+        else if (ua.includes("Android")) os = "Android";
+        else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+
+        let browser = "Unknown";
+        if (ua.includes("Chrome") && !ua.includes("Edg")) browser = "Chrome";
+        else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+        else if (ua.includes("Firefox")) browser = "Firefox";
+        else if (ua.includes("Edg")) browser = "Edge";
+
+        return `${os} (${browser})`;
+    }
 
     const passwordScreen = document.getElementById("passwordScreen");
     const passwordInput = document.getElementById("passwordInput");
@@ -727,8 +830,10 @@
     const ownerModal = document.getElementById("ownerModal");
     const saveAnnouncementBtn = document.getElementById("saveAnnouncementBtn");
     const closeOwnerBtn = document.getElementById("closeOwnerBtn");
+    const clearChatBtn = document.getElementById("clearChatBtn");
     const newAnnouncementInput = document.getElementById("newAnnouncementInput");
     const announcementDisplay = document.getElementById("announcementDisplay");
+    const userTableBody = document.getElementById("userTableBody");
 
     let username = localStorage.getItem("chatUsername");
     let userAvatar = localStorage.getItem("chatAvatar");
@@ -756,14 +861,35 @@
             ownerPanelBtn.style.display = "block";
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
+            registerUserSession();
             updateProfileUI();
         } else if (inputHash === USER_HASH || inputVal === "1234") {
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
+            registerUserSession();
             updateProfileUI();
         } else {
             passwordError.style.display = "block";
         }
+    }
+
+    function registerUserSession() {
+        if (!username) return;
+        const safeKey = username.replace(/[.#$[\]]/g, "_");
+
+        onValue(ref(database, `users/${safeKey}/banned`), (snapshot) => {
+            if (snapshot.val() === true) {
+                alert("You have been banned from Global Chat.");
+                location.reload();
+            }
+        });
+
+        set(ref(database, `users/${safeKey}`), {
+            username: username,
+            ip: userIp,
+            device: getDeviceDetails(),
+            lastActive: Date.now()
+        });
     }
 
     onValue(announcementRef, (snapshot) => {
@@ -771,7 +897,11 @@
         announcementDisplay.textContent = val || "Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.";
     });
 
-    ownerPanelBtn.addEventListener("click", () => { ownerModal.style.display = "flex"; });
+    ownerPanelBtn.addEventListener("click", () => {
+        ownerModal.style.display = "flex";
+        loadUserTable();
+    });
+
     closeOwnerBtn.addEventListener("click", () => { ownerModal.style.display = "none"; });
 
     saveAnnouncementBtn.addEventListener("click", async () => {
@@ -782,6 +912,48 @@
             ownerModal.style.display = "none";
         }
     });
+
+    clearChatBtn.addEventListener("click", async () => {
+        if (confirm("Are you sure you want to delete ALL messages?")) {
+            await set(messagesRef, null);
+            alert("Chat history cleared.");
+        }
+    });
+
+    function loadUserTable() {
+        onValue(usersRef, (snapshot) => {
+            const data = snapshot.val();
+            userTableBody.innerHTML = "";
+            if (!data) {
+                userTableBody.innerHTML = "<tr><td colspan='5'>No user logs found.</td></tr>";
+                return;
+            }
+
+            Object.keys(data).forEach(key => {
+                const user = data[key];
+                const tr = document.createElement("tr");
+
+                const isBanned = user.banned || false;
+                const statusHtml = isBanned ? "<span style='color:#f85149;'>Banned</span>" : "<span style='color:#3fb950;'>Active</span>";
+                const btnHtml = isBanned ?
+                    `<button class="unban-btn" onclick="toggleBan('${key}', false)">Unban</button>` :
+                    `<button class="ban-btn" onclick="toggleBan('${key}', true)">Ban</button>`;
+
+                tr.innerHTML = `
+                    <td><b>${user.username || key}</b></td>
+                    <td>${user.ip || 'Unknown'}</td>
+                    <td>${user.device || 'Unknown'}</td>
+                    <td>${statusHtml}</td>
+                    <td>${btnHtml}</td>
+                `;
+                userTableBody.appendChild(tr);
+            });
+        });
+    }
+
+    window.toggleBan = async (key, shouldBan) => {
+        await set(ref(database, `users/${key}/banned`), shouldBan);
+    };
 
     function updateProfileUI() {
         headerUsername.textContent = username || "User";
@@ -847,6 +1019,7 @@
         localStorage.setItem("chatUsername", username);
         localStorage.setItem("chatAvatar", userAvatar);
 
+        registerUserSession();
         updateProfileUI();
         editProfileModal.style.display = "none";
         editProfileError.style.display = "none";
@@ -892,6 +1065,7 @@
         localStorage.setItem("chatAvatar", userAvatar);
 
         usernameScreen.style.display = "none";
+        registerUserSession();
         updateProfileUI();
     }
 
