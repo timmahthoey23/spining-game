@@ -132,6 +132,30 @@
             text-overflow: ellipsis;
         }
 
+        /* Call Notification Banner */
+        .call-banner {
+            background: #5865f2;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 1px solid #30363d;
+            animation: appear 0.3s ease;
+        }
+
+        .call-banner-btn {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         .chat {
             flex: 1;
             display: flex;
@@ -345,7 +369,7 @@
         }
 
         .owner-card {
-            max-width: 700px !important;
+            max-width: 850px !important;
             text-align: left;
             max-height: 90vh;
             overflow-y: auto;
@@ -433,23 +457,65 @@
         .danger-btn { background: #da3633; }
         .danger-btn:hover { background: #f85149; }
 
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .admin-section {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .admin-section h4 {
+            color: #5865f2;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            background: #161b22;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
         .user-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
-            margin-bottom: 20px;
-            font-size: 13px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
         }
 
-        .user-table th, .user-table td { padding: 10px; border: 1px solid #30363d; text-align: left; }
+        .user-table th, .user-table td { padding: 8px; border: 1px solid #30363d; text-align: left; }
         .user-table th { background: #21262d; color: #8b949e; }
 
-        .ban-btn { background: #da3633; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
-        .unban-btn { background: #238636; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .action-sm-btn {
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .ban-btn { background: #da3633; }
+        .unban-btn { background: #238636; }
+        .mute-btn { background: #d29922; }
+        .purge-btn { background: #8b949e; }
 
         .error { color: #f85149; font-size: 13px; margin-top: 10px; display: none; }
 
-        /* Discord Style Voice/Video Call Modal */
         .call-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -537,6 +603,11 @@
         </div>
     </header>
 
+    <div id="incomingCallBanner" class="call-banner" style="display:none;">
+        <span>📞 <b id="callerNameText">User</b> has started a live video/voice call!</span>
+        <button id="joinCallBannerBtn" class="call-banner-btn">Join Call</button>
+    </div>
+
     <main class="chat">
         <div id="messages" class="messages"></div>
 
@@ -610,41 +681,87 @@
 <!-- EXPANDED OWNER CONTROL PANEL -->
 <div id="ownerModal" class="modal-screen" style="display:none;">
     <div class="modal-card owner-card">
-        <h2>⚙️ Owner Panel</h2>
-        <p>Manage announcements, user accounts, and room controls.</p>
+        <h2>⚙️ Owner Master Control Panel</h2>
+        <p>Complete control center for user management, room security, and live chat settings.</p>
 
-        <b style="color: #5865f2; font-size: 14px;">📢 Live Announcement</b>
-        <textarea
-            id="newAnnouncementInput"
-            class="modal-input"
-            rows="2"
-            placeholder="Type new announcement..."
-            style="margin-top: 8px;"
-        ></textarea>
-        <button id="saveAnnouncementBtn" class="modal-btn" style="margin-bottom: 20px;">Update Announcement</button>
-
-        <b style="color: #5865f2; font-size: 14px;">👥 Registered Accounts & Sessions</b>
-        <div style="overflow-x: auto;">
-            <table class="user-table">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>IP Address</th>
-                        <th>Device / OS</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody">
-                    <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
-                </tbody>
-            </table>
+        <!-- DASHBOARD METRICS -->
+        <div class="admin-section" style="margin-bottom: 15px;">
+            <h4>📊 Live Analytics</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
+                <div class="stats-row"><span>Online Users:</span><b id="statOnline">0</b></div>
+                <div class="stats-row"><span>Total Registered:</span><b id="statTotal">0</b></div>
+                <div class="stats-row"><span>Banned Accounts:</span><b id="statBanned">0</b></div>
+                <div class="stats-row"><span>Muted Users:</span><b id="statMuted">0</b></div>
+            </div>
         </div>
 
-        <b style="color: #f85149; font-size: 14px;">⚠️ Room Moderation</b>
-        <button id="clearChatBtn" class="modal-btn danger-btn" style="margin-top: 8px; margin-bottom: 12px;">🗑️ Clear Entire Chat History</button>
+        <div class="admin-grid">
+            <!-- QUICK CONTROLS -->
+            <div class="admin-section">
+                <h4>🔒 Security & Lockdown</h4>
+                <button id="toggleLockBtn" class="modal-btn" style="background: #d29922; margin-bottom: 8px;">🔒 Lock Chat (Read-Only Mode)</button>
+                <button id="forceReloadBtn" class="modal-btn" style="background: #8b949e; margin-bottom: 8px;">🔄 Force Refresh All Clients</button>
+                <b style="font-size:12px; color:#8b949e;">Update Access Passcode:</b>
+                <input id="newPasscodeInput" class="modal-input" type="text" placeholder="New Passcode..." style="margin-top: 4px; margin-bottom: 6px;">
+                <button id="savePasscodeBtn" class="modal-btn" style="padding: 8px;">Update Passcode</button>
+            </div>
 
-        <button id="closeOwnerBtn" class="modal-btn" style="background: #30363d;">Close Panel</button>
+            <!-- CHAT MODERATION -->
+            <div class="admin-section">
+                <h4>⏱️ Chat Speed & Filtering</h4>
+                <b style="font-size:12px; color:#8b949e;">Slowmode Cooldown:</b>
+                <select id="slowmodeSelect" class="modal-input" style="margin-top: 4px; margin-bottom: 8px;">
+                    <option value="0">Off (No Cooldown)</option>
+                    <option value="3">3 Seconds</option>
+                    <option value="5">5 Seconds</option>
+                    <option value="10">10 Seconds</option>
+                    <option value="30">30 Seconds</option>
+                </select>
+
+                <b style="font-size:12px; color:#8b949e;">Banned Words (comma separated):</b>
+                <input id="bannedWordsInput" class="modal-input" type="text" placeholder="bad, spam, word" style="margin-top: 4px; margin-bottom: 6px;">
+                <button id="saveFilterBtn" class="modal-btn" style="padding: 8px;">Save Word Filter</button>
+            </div>
+        </div>
+
+        <!-- LIVE BROADCAST ALERT -->
+        <div class="admin-section" style="margin-bottom: 15px;">
+            <h4>📢 Live Announcements & Popup Alerts</h4>
+            <textarea id="newAnnouncementInput" class="modal-input" rows="2" placeholder="Type room announcement..."></textarea>
+            <div style="display: flex; gap: 10px;">
+                <button id="saveAnnouncementBtn" class="modal-btn" style="flex: 1;">Set Announcement</button>
+                <button id="sendAlertBtn" class="modal-btn danger-btn" style="flex: 1;">🚨 Send Direct Popup Alert</button>
+            </div>
+        </div>
+
+        <!-- ACCOUNTS & SESSIONS TABLE -->
+        <div class="admin-section" style="margin-bottom: 15px;">
+            <h4>👥 Accounts & Live Moderation</h4>
+            <div style="overflow-x: auto;">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>IP Address</th>
+                            <th>Device</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DANGER ZONE -->
+        <div class="admin-section" style="border-color: #f85149;">
+            <h4 style="color: #f85149;">⚠️ Danger Zone</h4>
+            <button id="clearChatBtn" class="modal-btn danger-btn">🗑️ Clear Entire Global Chat History</button>
+        </div>
+
+        <button id="closeOwnerBtn" class="modal-btn" style="background: #30363d; margin-top: 15px;">Close Master Panel</button>
     </div>
 </div>
 
@@ -774,7 +891,8 @@
         set,
         remove,
         onChildRemoved,
-        onDisconnect
+        onDisconnect,
+        get
     }
         from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
@@ -796,13 +914,17 @@
     let messagesRef = ref(database, "messages");
     const announcementRef = ref(database, "announcement");
     const usersRef = ref(database, "users");
-    const typingRef = ref(database, "typing");
-    const callsRef = ref(database, "calls/global");
+    const configRef = ref(database, "config");
 
     const USER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
     let isOwner = false;
     let userIp = "Fetching...";
     let notificationsEnabled = localStorage.getItem("notificationsEnabled") === "true";
+    let customPasscode = null;
+    let isChatLocked = false;
+    let slowmodeDelay = 0;
+    let bannedWords = [];
+    let lastSentTimestamp = 0;
 
     fetch("https://api.ipify.org?format=json")
         .then(res => res.json())
@@ -867,6 +989,15 @@
     const announcementDisplay = document.getElementById("announcementDisplay");
     const userTableBody = document.getElementById("userTableBody");
 
+    const toggleLockBtn = document.getElementById("toggleLockBtn");
+    const forceReloadBtn = document.getElementById("forceReloadBtn");
+    const newPasscodeInput = document.getElementById("newPasscodeInput");
+    const savePasscodeBtn = document.getElementById("savePasscodeBtn");
+    const slowmodeSelect = document.getElementById("slowmodeSelect");
+    const bannedWordsInput = document.getElementById("bannedWordsInput");
+    const saveFilterBtn = document.getElementById("saveFilterBtn");
+    const sendAlertBtn = document.getElementById("sendAlertBtn");
+
     const notificationToggle = document.getElementById("notificationToggle");
     notificationToggle.checked = notificationsEnabled;
 
@@ -877,6 +1008,36 @@
     let attachedImageBase64 = null;
     let attachedAudioBase64 = null;
     let selectedReply = null;
+
+    // Listen to Firebase Room Config
+    onValue(configRef, (snapshot) => {
+        const cfg = snapshot.val() || {};
+        customPasscode = cfg.passcode || null;
+        isChatLocked = cfg.locked || false;
+        slowmodeDelay = parseInt(cfg.slowmode || 0);
+        bannedWords = cfg.bannedWords ? cfg.bannedWords.split(",").map(w => w.trim().toLowerCase()) : [];
+
+        if (slowmodeSelect) slowmodeSelect.value = slowmodeDelay;
+        if (bannedWordsInput) bannedWordsInput.value = cfg.bannedWords || "";
+        if (toggleLockBtn) toggleLockBtn.textContent = isChatLocked ? "🔓 Unlock Chat" : "🔒 Lock Chat (Read-Only Mode)";
+    });
+
+    // Listen for Force Reloads
+    onValue(ref(database, "config/forceReloadTrigger"), (snapshot) => {
+        const val = snapshot.val();
+        if (val && val > (window.loadedTime || 0)) {
+            location.reload();
+        }
+    });
+    window.loadedTime = Date.now();
+
+    // Listen for System Direct Alerts
+    onValue(ref(database, "config/directAlert"), (snapshot) => {
+        const alertMsg = snapshot.val();
+        if (alertMsg && alertMsg.timestamp > window.loadedTime) {
+            alert(`🚨 SYSTEM ALERT FROM ADMIN:\n\n${alertMsg.text}`);
+        }
+    });
 
     passwordButton.addEventListener("click", checkPassword);
     passwordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkPassword(); });
@@ -900,7 +1061,7 @@
             if (!username) usernameScreen.style.display = "flex";
             registerUserSession();
             updateProfileUI();
-        } else if (inputHash === USER_HASH || inputVal === "1234") {
+        } else if (inputHash === USER_HASH || inputVal === "1234" || (customPasscode && inputVal === customPasscode)) {
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
             registerUserSession();
@@ -915,8 +1076,9 @@
         const safeKey = username.replace(/[.#$[\]]/g, "_");
         const userStatusRef = ref(database, `users/${safeKey}`);
 
-        onValue(ref(database, `users/${safeKey}/banned`), (snapshot) => {
-            if (snapshot.val() === true) {
+        onValue(ref(database, `users/${safeKey}`), (snapshot) => {
+            const uData = snapshot.val();
+            if (uData && uData.banned === true) {
                 alert("You have been banned from Global Chat.");
                 location.reload();
             }
@@ -933,18 +1095,32 @@
         onDisconnect(userStatusRef).update({ online: false, lastActive: Date.now() });
     }
 
-    // Live Online Counter
+    // Live Online Counter & Stats Dashboard
     onValue(usersRef, (snapshot) => {
         const data = snapshot.val();
         let count = 0;
+        let total = 0;
+        let bannedCount = 0;
+        let mutedCount = 0;
+
         if (data) {
-            Object.values(data).forEach(u => {
+            const entries = Object.values(data);
+            total = entries.length;
+            entries.forEach(u => {
                 if (u.online) count++;
+                if (u.banned) bannedCount++;
+                if (u.muted) mutedCount++;
             });
         }
+
         const statusEl = document.getElementById("connectionStatus");
         statusEl.textContent = `● ${count} Online`;
         statusEl.style.color = "#3fb950";
+
+        if (document.getElementById("statOnline")) document.getElementById("statOnline").textContent = count;
+        if (document.getElementById("statTotal")) document.getElementById("statTotal").textContent = total;
+        if (document.getElementById("statBanned")) document.getElementById("statBanned").textContent = bannedCount;
+        if (document.getElementById("statMuted")) document.getElementById("statMuted").textContent = mutedCount;
     });
 
     onValue(announcementRef, (snapshot) => {
@@ -952,6 +1128,7 @@
         announcementDisplay.textContent = val || "Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.";
     });
 
+    // MASTER OWNER PANEL JS CONTROLS
     ownerPanelBtn.addEventListener("click", () => {
         ownerModal.style.display = "flex";
         loadUserTable();
@@ -959,12 +1136,50 @@
 
     closeOwnerBtn.addEventListener("click", () => { ownerModal.style.display = "none"; });
 
+    toggleLockBtn.addEventListener("click", async () => {
+        isChatLocked = !isChatLocked;
+        await set(ref(database, "config/locked"), isChatLocked);
+        alert(isChatLocked ? "Chat is now Locked." : "Chat is now Unlocked.");
+    });
+
+    forceReloadBtn.addEventListener("click", async () => {
+        if (confirm("Force reload all connected users now?")) {
+            await set(ref(database, "config/forceReloadTrigger"), Date.now());
+        }
+    });
+
+    savePasscodeBtn.addEventListener("click", async () => {
+        const pass = newPasscodeInput.value.trim();
+        if (pass) {
+            await set(ref(database, "config/passcode"), pass);
+            newPasscodeInput.value = "";
+            alert("Custom passcode updated successfully!");
+        }
+    });
+
+    slowmodeSelect.addEventListener("change", async (e) => {
+        await set(ref(database, "config/slowmode"), parseInt(e.target.value));
+    });
+
+    saveFilterBtn.addEventListener("click", async () => {
+        await set(ref(database, "config/bannedWords"), bannedWordsInput.value.trim());
+        alert("Banned word filter updated!");
+    });
+
+    sendAlertBtn.addEventListener("click", async () => {
+        const text = newAnnouncementInput.value.trim();
+        if (text) {
+            await set(ref(database, "config/directAlert"), { text: text, timestamp: Date.now() });
+            alert("Popup alert sent to all online clients!");
+        }
+    });
+
     saveAnnouncementBtn.addEventListener("click", async () => {
         const text = newAnnouncementInput.value.trim();
         if (text) {
             await set(announcementRef, text);
             newAnnouncementInput.value = "";
-            ownerModal.style.display = "none";
+            alert("Announcement updated!");
         }
     });
 
@@ -989,17 +1204,20 @@
                 const tr = document.createElement("tr");
 
                 const isBanned = user.banned || false;
-                const statusHtml = isBanned ? "<span style='color:#f85149;'>Banned</span>" : "<span style='color:#3fb950;'>Active</span>";
-                const btnHtml = isBanned ?
-                    `<button class="unban-btn" onclick="toggleBan('${key}', false)">Unban</button>` :
-                    `<button class="ban-btn" onclick="toggleBan('${key}', true)">Ban</button>`;
+                const isMuted = user.muted || false;
 
+                const statusHtml = isBanned ? "<span style='color:#f85149;'>Banned</span>" : (user.online ? "<span style='color:#3fb950;'>Online</span>" : "<span style='color:#8b949e;'>Offline</span>");
+                
                 tr.innerHTML = `
-                    <td><b>${user.username || key}</b></td>
+                    <td><b>${user.username || key}</b> ${isMuted ? '🔇' : ''}</td>
                     <td>${user.ip || 'Unknown'}</td>
                     <td>${user.device || 'Unknown'}</td>
                     <td>${statusHtml}</td>
-                    <td>${btnHtml}</td>
+                    <td>
+                        <button class="action-sm-btn ${isBanned ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${key}', ${!isBanned})">${isBanned ? 'Unban' : 'Ban'}</button>
+                        <button class="action-sm-btn mute-btn" onclick="toggleMute('${key}', ${!isMuted})">${isMuted ? 'Unmute' : 'Mute'}</button>
+                        <button class="action-sm-btn purge-btn" onclick="purgeUserMessages('${user.username}')">Purge Msgs</button>
+                    </td>
                 `;
                 userTableBody.appendChild(tr);
             });
@@ -1008,6 +1226,23 @@
 
     window.toggleBan = async (key, shouldBan) => {
         await set(ref(database, `users/${key}/banned`), shouldBan);
+    };
+
+    window.toggleMute = async (key, shouldMute) => {
+        await set(ref(database, `users/${key}/muted`), shouldMute);
+    };
+
+    window.purgeUserMessages = async (targetUsername) => {
+        if (!confirm(`Delete all messages sent by ${targetUsername}?`)) return;
+        const msgSnap = await get(messagesRef);
+        if (msgSnap.exists()) {
+            msgSnap.forEach(child => {
+                if (child.val().username === targetUsername) {
+                    remove(ref(database, `messages/${child.key}`));
+                }
+            });
+            alert(`Purged messages from ${targetUsername}.`);
+        }
     };
 
     function updateProfileUI() {
@@ -1248,12 +1483,40 @@
         });
     }
 
+    // Message Sending Logic with Moderation Rules
     messageForm.addEventListener("submit", async function(event) {
         event.preventDefault();
 
-        const text = messageInput.value.trim();
+        if (isChatLocked && !isOwner) {
+            return alert("Chat is currently locked in read-only mode by admin.");
+        }
+
+        const safeKey = username.replace(/[.#$[\]]/g, "_");
+        const userSnap = await get(ref(database, `users/${safeKey}`));
+        if (userSnap.exists() && userSnap.val().muted === true) {
+            return alert("You are currently muted by an admin.");
+        }
+
+        if (slowmodeDelay > 0 && !isOwner) {
+            const elapsed = (Date.now() - lastSentTimestamp) / 1000;
+            if (elapsed < slowmodeDelay) {
+                return alert(`Slowmode active! Please wait ${(slowmodeDelay - elapsed).toFixed(1)} seconds.`);
+            }
+        }
+
+        let text = messageInput.value.trim();
         if (!text && !attachedImageBase64 && !attachedAudioBase64) return;
         if (!username) return alert("Choose a username first.");
+
+        // Banned Words Filter
+        if (bannedWords.length > 0) {
+            bannedWords.forEach(word => {
+                if (word && text.toLowerCase().includes(word)) {
+                    const regex = new RegExp(word, "gi");
+                    text = text.replace(regex, "****");
+                }
+            });
+        }
 
         try {
             await push(messagesRef, {
@@ -1266,6 +1529,7 @@
                 timestamp: Date.now()
             });
 
+            lastSentTimestamp = Date.now();
             messageInput.value = "";
             attachedImageBase64 = null;
             attachedAudioBase64 = null;
@@ -1275,7 +1539,6 @@
             fileInput.value = "";
             messageInput.focus();
 
-            const safeKey = username.replace(/[.#$[\]]/g, "_");
             set(ref(database, `typing/${currentRoom}/${safeKey}`), null);
 
         } catch (error) {
@@ -1283,8 +1546,6 @@
             alert("Message could not be sent. Check your Firebase settings.");
         }
     });
-
-    let currentMessagesQuery = null;
 
     function loadRoomMessages(roomName = "global") {
         messages.innerHTML = "";
@@ -1423,7 +1684,7 @@
         messages.scrollTop = messages.scrollHeight;
     }
 
-    // Direct Messages (DMs) Modal & Logic
+    // Direct Messages (DMs)
     const dmSelectBtn = document.getElementById("dmSelectBtn");
     const dmModal = document.getElementById("dmModal");
     const closeDmBtn = document.getElementById("closeDmBtn");
@@ -1461,12 +1722,15 @@
 
     closeDmBtn.addEventListener("click", () => dmModal.style.display = "none");
 
-    // Call / Video Feature (Discord-style using WebRTC Signaling)
+    // FIXED WebRTC Call & Global Call Announcement
     const callBtn = document.getElementById("callBtn");
     const callModal = document.getElementById("callModal");
     const leaveCallBtn = document.getElementById("leaveCallBtn");
     const toggleMicBtn = document.getElementById("toggleMicBtn");
     const toggleCamBtn = document.getElementById("toggleCamBtn");
+    const incomingCallBanner = document.getElementById("incomingCallBanner");
+    const callerNameText = document.getElementById("callerNameText");
+    const joinCallBannerBtn = document.getElementById("joinCallBannerBtn");
 
     const localVideo = document.getElementById("localVideo");
     const remoteVideo = document.getElementById("remoteVideo");
@@ -1478,11 +1742,33 @@
 
     const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
+    // Listen for Global Incoming Calls
+    onValue(ref(database, "calls/global/status"), (snapshot) => {
+        const callData = snapshot.val();
+        if (callData && callData.isCalling && callData.caller !== username) {
+            callerNameText.textContent = callData.caller;
+            incomingCallBanner.style.display = "flex";
+        } else {
+            incomingCallBanner.style.display = "none";
+        }
+    });
+
+    joinCallBannerBtn.addEventListener("click", () => {
+        incomingCallBanner.style.display = "none";
+        callBtn.click();
+    });
+
     callBtn.addEventListener("click", async () => {
         callModal.style.display = "flex";
         try {
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             localVideo.srcObject = localStream;
+
+            set(ref(database, "calls/global/status"), {
+                caller: username,
+                isCalling: true
+            });
+
             initPeerConnection();
         } catch (e) {
             alert("Unable to access camera or microphone.");
@@ -1498,27 +1784,45 @@
             remoteVideo.srcObject = e.streams[0];
         };
 
+        const safeKey = username.replace(/[.#$[\]]/g, "_");
         peerConnection.onicecandidate = (e) => {
             if (e.candidate) {
-                push(ref(database, `calls/${currentRoom}/candidates`), e.candidate.toJSON());
+                push(ref(database, `calls/global/candidates/${safeKey}`), e.candidate.toJSON());
             }
         };
 
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        set(ref(database, `calls/${currentRoom}/offer`), offer);
+        const offerRef = ref(database, "calls/global/offer");
+        const answerRef = ref(database, "calls/global/answer");
 
-        onValue(ref(database, `calls/${currentRoom}/answer`), async (snapshot) => {
+        // Check if offer exists or create one
+        const offerSnap = await get(offerRef);
+        if (offerSnap.exists()) {
+            const offer = offerSnap.val();
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            set(answerRef, { type: answer.type, sdp: answer.sdp });
+        } else {
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            set(offerRef, { type: offer.type, sdp: offer.sdp });
+        }
+
+        onValue(answerRef, async (snapshot) => {
             const answer = snapshot.val();
-            if (answer && !peerConnection.currentRemoteDescription) {
+            if (answer && peerConnection.signalingState === "have-local-offer") {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
             }
         });
 
-        onChildAdded(ref(database, `calls/${currentRoom}/candidates`), async (snapshot) => {
-            const candidate = snapshot.val();
-            if (candidate && peerConnection.remoteDescription) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        onChildAdded(ref(database, "calls/global/candidates"), (snapshot) => {
+            if (snapshot.key !== safeKey) {
+                onChildAdded(snapshot.ref, async (candSnap) => {
+                    const candidate = candSnap.val();
+                    if (candidate) {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                    }
+                });
             }
         });
     }
@@ -1542,7 +1846,7 @@
     leaveCallBtn.addEventListener("click", () => {
         if (localStream) localStream.getTracks().forEach(t => t.stop());
         if (peerConnection) peerConnection.close();
-        remove(callsRef);
+        remove(ref(database, "calls/global"));
         callModal.style.display = "none";
     });
 </script>
