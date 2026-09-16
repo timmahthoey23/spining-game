@@ -18,7 +18,49 @@
             color: white;
             height: 100vh;
             overflow: hidden;
+            transition: background 0.3s, color 0.3s;
         }
+
+        /* Themes */
+        body.theme-cyberpunk {
+            background: #050515;
+            color: #00ffcc;
+        }
+        body.theme-cyberpunk .header, body.theme-cyberpunk .input-area, body.theme-cyberpunk .modal-card, body.theme-cyberpunk .admin-section {
+            background: #0b0b26;
+            border-color: #ff007f;
+        }
+        body.theme-cyberpunk #messageInput, body.theme-cyberpunk .modal-input {
+            background: #050515;
+            color: #00ffcc;
+            border-color: #ff007f;
+        }
+
+        body.theme-holiday {
+            background: #0f2b1d;
+            color: #ea4335;
+        }
+        body.theme-holiday .header, body.theme-holiday .input-area, body.theme-holiday .modal-card, body.theme-holiday .admin-section {
+            background: #16422c;
+            border-color: #34a853;
+        }
+
+        body.theme-light {
+            background: #f6f8fa;
+            color: #24292f;
+        }
+        body.theme-light .header, body.theme-light .input-area, body.theme-light .modal-card, body.theme-light .admin-section {
+            background: #ffffff;
+            border-color: #d0d7de;
+            color: #24292f;
+        }
+        body.theme-light #messageInput, body.theme-light .modal-input {
+            background: #ffffff;
+            color: #24292f;
+            border-color: #d0d7de;
+        }
+        body.theme-light .text { color: #24292f; }
+        body.theme-light .username { color: #0969da; }
 
         .app {
             height: 100vh;
@@ -132,8 +174,8 @@
             text-overflow: ellipsis;
         }
 
-        /* Call Notification Banner */
-        .call-banner {
+        /* Banner & Call Styles */
+        .call-banner, .pinned-banner, .event-banner {
             background: #5865f2;
             color: white;
             padding: 10px 20px;
@@ -145,6 +187,9 @@
             border-bottom: 1px solid #30363d;
             animation: appear 0.3s ease;
         }
+
+        .pinned-banner { background: #1f6beb; }
+        .event-banner { background: #d29922; color: #0d1117; }
 
         .call-banner-btn {
             background: #238636;
@@ -218,6 +263,25 @@
             color: #ffffff;
         }
 
+        .user-badge {
+            background: #30363d;
+            color: #f0f6fc;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .role-badge {
+            background: #238636;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
         .time {
             color: #8b949e;
             font-size: 11px;
@@ -260,6 +324,31 @@
             border-radius: 4px;
             margin-bottom: 4px;
         }
+
+        .poll-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 8px;
+            max-width: 350px;
+        }
+
+        .poll-option-btn {
+            width: 100%;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: white;
+            padding: 8px;
+            margin-top: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .poll-option-btn:hover { background: #30363d; }
 
         .input-area {
             padding: 15px 20px 20px;
@@ -356,6 +445,7 @@
 
         #passwordScreen { z-index: 101; }
         #ownerModal { z-index: 102; }
+        #maintenanceScreen { z-index: 200; display: none; }
 
         .modal-card {
             width: 100%;
@@ -369,7 +459,7 @@
         }
 
         .owner-card {
-            max-width: 850px !important;
+            max-width: 950px !important;
             text-align: left;
             max-height: 90vh;
             overflow-y: auto;
@@ -425,21 +515,21 @@
         .avatar-picker img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-picker-label { color: #8b949e; font-size: 13px; }
 
-        .modal-input {
+        .modal-input, .modal-select {
             width: 100%;
             background: #0d1117;
             color: white;
             border: 1px solid #30363d;
             border-radius: 10px;
-            padding: 14px;
-            font-size: 15px;
+            padding: 10px 14px;
+            font-size: 14px;
             outline: none;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             text-align: left;
             font-family: inherit;
         }
 
-        .modal-input:focus { border-color: #5865f2; }
+        .modal-input:focus, .modal-select:focus { border-color: #5865f2; }
 
         .modal-btn {
             width: 100%;
@@ -447,21 +537,52 @@
             background: #5865f2;
             color: white;
             border-radius: 10px;
-            padding: 14px;
-            font-size: 15px;
+            padding: 10px 14px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
+            margin-bottom: 6px;
         }
 
         .modal-btn:hover { background: #4752c4; }
         .danger-btn { background: #da3633; }
         .danger-btn:hover { background: #f85149; }
 
+        .owner-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: #5865f2;
+            color: white;
+            border-color: #5865f2;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         .admin-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .admin-section {
@@ -507,12 +628,25 @@
             font-size: 11px;
             font-weight: bold;
             margin-right: 4px;
+            margin-bottom: 2px;
         }
 
         .ban-btn { background: #da3633; }
         .unban-btn { background: #238636; }
         .mute-btn { background: #d29922; }
         .purge-btn { background: #8b949e; }
+
+        .audit-log-box {
+            background: #000000;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+            color: #3fb950;
+        }
 
         .error { color: #f85149; font-size: 13px; margin-top: 10px; display: none; }
 
@@ -605,6 +739,16 @@
         </div>
     </header>
 
+    <div id="pinnedMessageBanner" class="pinned-banner" style="display:none;">
+        <span>📌 <b id="pinnedText">Pinned Announcement</b></span>
+        <button id="closePinnedBtn" style="background:none; border:none; color:white; cursor:pointer;">✖</button>
+    </div>
+
+    <div id="eventSchedulerBanner" class="event-banner" style="display:none;">
+        <span>📅 <b id="eventBannerText">Upcoming Event</b></span>
+        <span id="eventTimerText"></span>
+    </div>
+
     <div id="incomingCallBanner" class="call-banner" style="display:none;">
         <span>📞 <b id="callerNameText">User</b> has started a live video/voice call!</span>
         <button id="joinCallBannerBtn" class="call-banner-btn">Join Call</button>
@@ -676,87 +820,277 @@
     </div>
 </div>
 
-<!-- EXPANDED OWNER CONTROL PANEL -->
+<!-- MAINTENANCE LANDING SCREEN -->
+<div id="maintenanceScreen" class="modal-screen">
+    <div class="modal-card">
+        <h2>🛠️ Under Maintenance</h2>
+        <p>The site is currently underwent scheduled maintenance. Please check back shortly!</p>
+    </div>
+</div>
+
+<!-- EXPANDED MASTER OWNER CONTROL PANEL -->
 <div id="ownerModal" class="modal-screen" style="display:none;">
     <div class="modal-card owner-card">
-        <h2>⚙️ Owner Master Control Panel</h2>
-        <p>Complete control center for user management, room security, and live chat settings.</p>
+        <h2>⚙️ Owner Master Control Center</h2>
+        <p>Complete control center for user management, room security, features, and site cosmetics.</p>
 
         <!-- DASHBOARD METRICS -->
         <div class="admin-section" style="margin-bottom: 15px;">
             <h4>📊 Live Analytics</h4>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
-                <div class="stats-row"><span>Online Users:</span><b id="statOnline">0</b></div>
-                <div class="stats-row"><span>Total Registered:</span><b id="statTotal">0</b></div>
-                <div class="stats-row"><span>Banned Accounts:</span><b id="statBanned">0</b></div>
-                <div class="stats-row"><span>Muted Users:</span><b id="statMuted">0</b></div>
+                <div class="stats-row"><span>Online:</span><b id="statOnline">0</b></div>
+                <div class="stats-row"><span>Registered:</span><b id="statTotal">0</b></div>
+                <div class="stats-row"><span>Banned:</span><b id="statBanned">0</b></div>
+                <div class="stats-row"><span>Muted:</span><b id="statMuted">0</b></div>
             </div>
         </div>
 
-        <div class="admin-grid">
-            <!-- QUICK CONTROLS -->
+        <!-- OWNER NAVIGATION TABS -->
+        <div class="owner-tabs">
+            <button class="tab-btn active" onclick="switchOwnerTab('tab-users')">👥 User & Roles</button>
+            <button class="tab-btn" onclick="switchOwnerTab('tab-moderation')">🛡️ Moderation & Chat</button>
+            <button class="tab-btn" onclick="switchOwnerTab('tab-cosmetics')">🎨 Themes & Cosmetics</button>
+            <button class="tab-btn" onclick="switchOwnerTab('tab-system')">💻 System & Security</button>
+            <button class="tab-btn" onclick="switchOwnerTab('tab-engagement')">🎉 Engagement & Tools</button>
+            <button class="tab-btn" onclick="switchOwnerTab('tab-audit')">📋 Audit Logs</button>
+        </div>
+
+        <!-- TAB 1: USER & ROLE MANAGEMENT -->
+        <div id="tab-users" class="tab-content active">
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4>🎭 Role & Badge Assignment</h4>
+                    <b style="font-size:12px; color:#8b949e;">Target Username:</b>
+                    <input id="targetUserInput" class="modal-input" placeholder="e.g. JohnDoe">
+                    <b style="font-size:12px; color:#8b949e;">Assign Role:</b>
+                    <select id="roleSelect" class="modal-select">
+                        <option value="User">User</option>
+                        <option value="VIP">VIP</option>
+                        <option value="Moderator">Moderator</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                    <button id="saveRoleBtn" class="modal-btn">Update User Role</button>
+
+                    <b style="font-size:12px; color:#8b949e; margin-top:8px; display:block;">Assign Custom Badge Tag:</b>
+                    <input id="badgeTextInput" class="modal-input" placeholder="e.g. ⭐ PRO / 👑 ELITE">
+                    <button id="saveBadgeBtn" class="modal-btn" style="background:#d29922;">Set User Badge</button>
+                </div>
+
+                <div class="admin-section">
+                    <h4>⏱️ Timed Sanctions & Force Rename</h4>
+                    <b style="font-size:12px; color:#8b949e;">Timed Sanction Duration:</b>
+                    <select id="sanctionTimeSelect" class="modal-select">
+                        <option value="600">10 Minutes</option>
+                        <option value="3600">1 Hour</option>
+                        <option value="86400">24 Hours</option>
+                    </select>
+                    <div style="display:flex; gap:6px;">
+                        <button id="timedBanBtn" class="modal-btn danger-btn">Timed Ban</button>
+                        <button id="timedMuteBtn" class="modal-btn" style="background:#d29922;">Timed Mute</button>
+                    </div>
+
+                    <b style="font-size:12px; color:#8b949e; margin-top:8px; display:block;">Force Name Change:</b>
+                    <input id="forceNewNameInput" class="modal-input" placeholder="New display name...">
+                    <button id="forceRenameBtn" class="modal-btn">Apply Force Rename</button>
+                </div>
+            </div>
+
+            <!-- ACCOUNTS & SESSIONS TABLE -->
             <div class="admin-section">
-                <h4>🔒 Security & Lockdown</h4>
-                <button id="toggleLockBtn" class="modal-btn" style="background: #d29922; margin-bottom: 8px;">🔒 Lock Chat (Read-Only Mode)</button>
-                <button id="forceReloadBtn" class="modal-btn" style="background: #8b949e; margin-bottom: 8px;">🔄 Force Refresh All Clients</button>
-                <b style="font-size:12px; color:#8b949e;">Update Access Passcode:</b>
-                <input id="newPasscodeInput" class="modal-input" type="text" placeholder="New Passcode..." style="margin-top: 4px; margin-bottom: 6px;">
-                <button id="savePasscodeBtn" class="modal-btn" style="padding: 8px;">Update Passcode</button>
+                <h4>👥 Accounts & Live Moderation</h4>
+                <div style="overflow-x: auto;">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>IP Address</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: CHAT & MODERATION FEATURES -->
+        <div id="tab-moderation" class="tab-content">
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4>🤖 Automated Keyword Actions</h4>
+                    <b style="font-size:12px; color:#8b949e;">Banned Words (comma separated):</b>
+                    <input id="bannedWordsInput" class="modal-input" placeholder="bad, spam, word">
+                    <b style="font-size:12px; color:#8b949e;">Auto-Action on 3 Strikes:</b>
+                    <select id="autoActionSelect" class="modal-select">
+                        <option value="mute">Auto-Mute User</option>
+                        <option value="ban">Auto-Ban User</option>
+                    </select>
+                    <button id="saveFilterBtn" class="modal-btn">Save Keyword Rules</button>
+                </div>
+
+                <div class="admin-section">
+                    <h4>🖼️ Media & Link Toggles</h4>
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
+                        <label><input type="checkbox" id="toggleImages" checked> Allow Image Attachments</label>
+                        <label><input type="checkbox" id="toggleGifs" checked> Allow GIFs</label>
+                        <label><input type="checkbox" id="toggleLinks" checked> Allow External URLs</label>
+                    </div>
+                    <button id="saveMediaTogglesBtn" class="modal-btn">Save Toggle Controls</button>
+                </div>
             </div>
 
-            <!-- CHAT MODERATION -->
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4>📌 Pinned Message Control</h4>
+                    <input id="pinnedInput" class="modal-input" placeholder="Type top announcement banner...">
+                    <div style="display:flex; gap:6px;">
+                        <button id="savePinnedBtn" class="modal-btn">Set Pinned Announcement</button>
+                        <button id="clearPinnedBtn" class="modal-btn danger-btn">Clear</button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h4>📤 Export Chat Messages</h4>
+                    <b style="font-size:12px; color:#8b949e;">Download full chat transcript:</b>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                        <button id="exportJsonBtn" class="modal-btn">Export JSON</button>
+                        <button id="exportCsvBtn" class="modal-btn" style="background:#238636;">Export CSV</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="admin-section">
-                <h4>⏱️ Chat Speed & Filtering</h4>
-                <b style="font-size:12px; color:#8b949e;">Slowmode Cooldown:</b>
-                <select id="slowmodeSelect" class="modal-input" style="margin-top: 4px; margin-bottom: 8px;">
-                    <option value="0">Off (No Cooldown)</option>
-                    <option value="3">3 Seconds</option>
-                    <option value="5">5 Seconds</option>
-                    <option value="10">10 Seconds</option>
-                    <option value="30">30 Seconds</option>
-                </select>
-
-                <b style="font-size:12px; color:#8b949e;">Banned Words (comma separated):</b>
-                <input id="bannedWordsInput" class="modal-input" type="text" placeholder="bad, spam, word" style="margin-top: 4px; margin-bottom: 6px;">
-                <button id="saveFilterBtn" class="modal-btn" style="padding: 8px;">Save Word Filter</button>
+                <h4>🕵️ Direct Message Inspector</h4>
+                <button id="loadDmLogsBtn" class="modal-btn" style="background:#5865f2; margin-bottom:10px;">Inspect Recent Private DMs</button>
+                <div id="dmInspectorLogs" style="max-height:150px; overflow-y:auto; background:#000; padding:10px; border-radius:8px; font-size:12px;">Click inspect to load logs...</div>
             </div>
         </div>
 
-        <!-- LIVE BROADCAST ALERT -->
-        <div class="admin-section" style="margin-bottom: 15px;">
-            <h4>📢 Live Announcements & Popup Alerts</h4>
-            <textarea id="newAnnouncementInput" class="modal-input" rows="2" placeholder="Type room announcement..."></textarea>
-            <div style="display: flex; gap: 10px;">
-                <button id="saveAnnouncementBtn" class="modal-btn" style="flex: 1;">Set Announcement</button>
-                <button id="sendAlertBtn" class="modal-btn danger-btn" style="flex: 1;">🚨 Send Direct Popup Alert</button>
+        <!-- TAB 3: CUSTOMIZATION & SITE COSMETICS -->
+        <div id="tab-cosmetics" class="tab-content">
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4>🎨 Global Theme Selector</h4>
+                    <select id="themeSelect" class="modal-select">
+                        <option value="default">Dark Mode (Default)</option>
+                        <option value="cyberpunk">Cyberpunk Neon</option>
+                        <option value="holiday">Holiday Festive</option>
+                        <option value="light">Light Mode</option>
+                    </select>
+                    <button id="saveThemeBtn" class="modal-btn">Apply Theme To All</button>
+                </div>
+
+                <div class="admin-section">
+                    <h4>🔊 Chatroom Sound FX Controls</h4>
+                    <label style="display:block; margin-bottom:8px;"><input type="checkbox" id="soundFxToggle" checked> Enable Default Chat Notification SFX</label>
+                    <b style="font-size:12px; color:#8b949e;">Default Notification Sound:</b>
+                    <select id="soundTypeSelect" class="modal-select">
+                        <option value="chime">Classic Chime</option>
+                        <option value="pop">Pop Sound</option>
+                        <option value="cyber">Cyber Beep</option>
+                    </select>
+                    <button id="saveSoundBtn" class="modal-btn">Save SFX Settings</button>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h4>😀 Custom Emoji & Sticker Management</h4>
+                <div style="display:flex; gap:8px;">
+                    <input id="emojiShortcode" class="modal-input" placeholder=":smile:" style="flex:1;">
+                    <input id="emojiUrl" class="modal-input" placeholder="Image URL..." style="flex:2;">
+                    <button id="addEmojiBtn" class="modal-btn" style="width:auto; padding:0 15px;">Add Emoji</button>
+                </div>
+                <div id="customEmojiList" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
             </div>
         </div>
 
-        <!-- ACCOUNTS & SESSIONS TABLE -->
-        <div class="admin-section" style="margin-bottom: 15px;">
-            <h4>👥 Accounts & Live Moderation</h4>
-            <div style="overflow-x: auto;">
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>IP Address</th>
-                            <th>Device</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
-                    </tbody>
-                </table>
+        <!-- TAB 4: SYSTEM HEALTH & SECURITY -->
+        <div id="tab-system" class="tab-content">
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4>🚫 IP Range & Subnet Blocking</h4>
+                    <input id="subnetInput" class="modal-input" placeholder="e.g. 192.168.1.* or 10.0.*">
+                    <button id="blockSubnetBtn" class="modal-btn danger-btn">Block IP Subnet</button>
+                    <div id="blockedSubnetsList" style="font-size:12px; color:#8b949e; margin-top:8px;"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h4>🔒 Verification & Maintenance Toggles</h4>
+                    <label style="display:block; margin-bottom:8px;"><input type="checkbox" id="verificationToggle"> Require Manual Admin Verification for Logins</label>
+                    <label style="display:block; margin-bottom:8px;"><input type="checkbox" id="maintenanceToggle"> Enable Global Maintenance Mode Landing Page</label>
+                    <button id="saveSecurityTogglesBtn" class="modal-btn">Update Security Policies</button>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4>⚡ Rate Limiting Configuration</h4>
+                    <b style="font-size:12px; color:#8b949e;">Slowmode Cooldown (Seconds):</b>
+                    <select id="slowmodeSelect" class="modal-select">
+                        <option value="0">Off (No Limit)</option>
+                        <option value="3">3 Seconds</option>
+                        <option value="5">5 Seconds</option>
+                        <option value="10">10 Seconds</option>
+                        <option value="30">30 Seconds</option>
+                    </select>
+                    <button id="saveSlowmodeBtn" class="modal-btn">Apply Cooldown</button>
+                </div>
+
+                <div class="admin-section">
+                    <h4>💾 Database Backup & Restore</h4>
+                    <div style="display:flex; gap:6px;">
+                        <button id="backupDbBtn" class="modal-btn" style="background:#238636;">Download Backup</button>
+                        <input type="file" id="restoreDbFileInput" accept=".json" style="display:none;">
+                        <button id="restoreDbBtn" class="modal-btn" style="background:#d29922;">Restore Backup</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h4>📱 Active Sessions & Danger Zone</h4>
+                <button id="kickAllSessionsBtn" class="modal-btn danger-btn" style="margin-bottom:8px;">Force Log-Out All Devices Across Room</button>
+                <button id="clearChatBtn" class="modal-btn danger-btn">🗑️ Clear Entire Global Chat History</button>
             </div>
         </div>
 
-        <!-- DANGER ZONE -->
-        <div class="admin-section" style="border-color: #f85149;">
-            <h4 style="color: #f85149;">⚠️ Danger Zone</h4>
-            <button id="clearChatBtn" class="modal-btn danger-btn">🗑️ Clear Entire Global Chat History</button>
+        <!-- TAB 5: ENGAGEMENT & FUN TOOLS -->
+        <div id="tab-engagement" class="tab-content">
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4>📊 Poll & Voting Creator</h4>
+                    <input id="pollQuestionInput" class="modal-input" placeholder="Poll Question...">
+                    <input id="pollOptionsInput" class="modal-input" placeholder="Option 1, Option 2, Option 3">
+                    <button id="launchPollBtn" class="modal-btn">Launch Chat Poll</button>
+                </div>
+
+                <div class="admin-section">
+                    <h4>📅 Event Scheduler</h4>
+                    <input id="eventTitleInput" class="modal-input" placeholder="Event Name...">
+                    <input id="eventTimeInput" class="modal-input" type="datetime-local">
+                    <button id="scheduleEventBtn" class="modal-btn">Schedule Top Banner Event</button>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h4>🎲 Mini-Game Controls</h4>
+                <div style="display:flex; gap:15px;">
+                    <label><input type="checkbox" id="toggleTrivia"> Chat Trivia Bot</label>
+                    <label><input type="checkbox" id="toggleDice"> Dice Rolling Commands (/roll)</label>
+                </div>
+                <button id="saveMiniGamesBtn" class="modal-btn" style="margin-top:10px;">Save Game Toggles</button>
+            </div>
+        </div>
+
+        <!-- TAB 6: AUDIT LOGS -->
+        <div id="tab-audit" class="tab-content">
+            <div class="admin-section">
+                <h4>📋 Dedicated Admin Audit Logs</h4>
+                <div id="auditLogBox" class="audit-log-box">Loading audit logs...</div>
+            </div>
         </div>
 
         <button id="closeOwnerBtn" class="modal-btn" style="background: #30363d; margin-top: 15px;">Close Master Panel</button>
@@ -913,6 +1247,7 @@
     const announcementRef = ref(database, "announcement");
     const usersRef = ref(database, "users");
     const configRef = ref(database, "config");
+    const auditLogsRef = ref(database, "auditLogs");
 
     const USER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
     let isOwner = false;
@@ -923,11 +1258,19 @@
     let slowmodeDelay = 0;
     let bannedWords = [];
     let lastSentTimestamp = 0;
+    let strikes = 0;
+
+    let mediaAllowed = true;
+    let linksAllowed = true;
+    let gifsAllowed = true;
+    let maintenanceMode = false;
+    let requireVerification = false;
+    let diceEnabled = true;
 
     fetch("https://api.ipify.org?format=json")
         .then(res => res.json())
         .then(data => userIp = data.ip)
-        .catch(() => userIp = "Unavailable");
+        .catch(() => userIp = "127.0.0.1");
 
     function getDeviceDetails() {
         const ua = navigator.userAgent;
@@ -980,21 +1323,13 @@
 
     const ownerPanelBtn = document.getElementById("ownerPanelBtn");
     const ownerModal = document.getElementById("ownerModal");
-    const saveAnnouncementBtn = document.getElementById("saveAnnouncementBtn");
-    const closeOwnerBtn = document.getElementById("closeOwnerBtn");
     const clearChatBtn = document.getElementById("clearChatBtn");
-    const newAnnouncementInput = document.getElementById("newAnnouncementInput");
     const announcementDisplay = document.getElementById("announcementDisplay");
     const userTableBody = document.getElementById("userTableBody");
 
-    const toggleLockBtn = document.getElementById("toggleLockBtn");
-    const forceReloadBtn = document.getElementById("forceReloadBtn");
-    const newPasscodeInput = document.getElementById("newPasscodeInput");
-    const savePasscodeBtn = document.getElementById("savePasscodeBtn");
     const slowmodeSelect = document.getElementById("slowmodeSelect");
     const bannedWordsInput = document.getElementById("bannedWordsInput");
     const saveFilterBtn = document.getElementById("saveFilterBtn");
-    const sendAlertBtn = document.getElementById("sendAlertBtn");
 
     const notificationToggle = document.getElementById("notificationToggle");
     notificationToggle.checked = notificationsEnabled;
@@ -1007,6 +1342,23 @@
     let attachedAudioBase64 = null;
     let selectedReply = null;
 
+    // OWNER TABS
+    window.switchOwnerTab = function(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    };
+
+    // AUDIT LOG HELPER
+    function writeAuditLog(action) {
+        push(auditLogsRef, {
+            admin: username || "System",
+            action: action,
+            timestamp: Date.now()
+        });
+    }
+
     // Listen to Firebase Room Config
     onValue(configRef, (snapshot) => {
         const cfg = snapshot.val() || {};
@@ -1014,10 +1366,90 @@
         isChatLocked = cfg.locked || false;
         slowmodeDelay = parseInt(cfg.slowmode || 0);
         bannedWords = cfg.bannedWords ? cfg.bannedWords.split(",").map(w => w.trim().toLowerCase()) : [];
+        mediaAllowed = cfg.mediaAllowed !== false;
+        linksAllowed = cfg.linksAllowed !== false;
+        gifsAllowed = cfg.gifsAllowed !== false;
+        maintenanceMode = cfg.maintenanceMode || false;
+        requireVerification = cfg.requireVerification || false;
+        diceEnabled = cfg.diceEnabled !== false;
 
         if (slowmodeSelect) slowmodeSelect.value = slowmodeDelay;
         if (bannedWordsInput) bannedWordsInput.value = cfg.bannedWords || "";
-        if (toggleLockBtn) toggleLockBtn.textContent = isChatLocked ? "🔓 Unlock Chat" : "🔒 Lock Chat (Read-Only Mode)";
+
+        // Maintenance Mode handling
+        if (maintenanceMode && !isOwner) {
+            document.getElementById("maintenanceScreen").style.display = "flex";
+        } else {
+            document.getElementById("maintenanceScreen").style.display = "none";
+        }
+
+        // Global Theme Application
+        if (cfg.theme) {
+            document.body.className = cfg.theme === "default" ? "" : "theme-" + cfg.theme;
+        }
+    });
+
+    // Listen to Pinned Banner
+    onValue(ref(database, "config/pinnedMessage"), (snap) => {
+        const text = snap.val();
+        const banner = document.getElementById("pinnedMessageBanner");
+        if (text) {
+            document.getElementById("pinnedText").textContent = text;
+            banner.style.display = "flex";
+        } else {
+            banner.style.display = "none";
+        }
+    });
+
+    document.getElementById("closePinnedBtn").addEventListener("click", () => {
+        document.getElementById("pinnedMessageBanner").style.display = "none";
+    });
+
+    // Listen to Scheduled Event Banner
+    onValue(ref(database, "config/scheduledEvent"), (snap) => {
+        const evt = snap.val();
+        const banner = document.getElementById("eventSchedulerBanner");
+        if (evt && evt.title && evt.time) {
+            document.getElementById("eventBannerText").textContent = evt.title;
+            document.getElementById("eventTimerText").textContent = ` (Date: ${new Date(evt.time).toLocaleString()})`;
+            banner.style.display = "flex";
+        } else {
+            banner.style.display = "none";
+        }
+    });
+
+    // Audit Logs Realtime Listener
+    onValue(auditLogsRef, (snapshot) => {
+        const logs = snapshot.val();
+        const box = document.getElementById("auditLogBox");
+        if (!logs) {
+            box.innerHTML = "No audit log entries.";
+            return;
+        }
+        box.innerHTML = "";
+        Object.values(logs).forEach(log => {
+            const timeStr = new Date(log.timestamp).toLocaleTimeString();
+            box.innerHTML += `<div>[${timeStr}] <b>${log.admin}</b>: ${log.action}</div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+
+    // Listen for Subnet IP Bans
+    onValue(ref(database, "blockedSubnets"), (snapshot) => {
+        const subnets = snapshot.val() || {};
+        const subList = Object.keys(subnets).join(", ");
+        document.getElementById("blockedSubnetsList").textContent = "Blocked Subnets: " + (subList || "None");
+        
+        // Check if current user IP is blocked
+        if (!isOwner && userIp !== "Fetching...") {
+            Object.keys(subnets).forEach(sub => {
+                const prefix = sub.replace("*", "");
+                if (userIp.startsWith(prefix)) {
+                    alert("Your IP Subnet has been blocked by administrators.");
+                    location.reload();
+                }
+            });
+        }
     });
 
     // Listen for Force Reloads
@@ -1029,7 +1461,7 @@
     });
     window.loadedTime = Date.now();
 
-    // Listen for System Direct Alerts
+    // Listen for Direct System Alerts
     onValue(ref(database, "config/directAlert"), (snapshot) => {
         const alertMsg = snapshot.val();
         if (alertMsg && alertMsg.timestamp > window.loadedTime) {
@@ -1074,11 +1506,22 @@
         const safeKey = username.replace(/[.#$[\]]/g, "_");
         const userStatusRef = ref(database, `users/${safeKey}`);
 
-        onValue(ref(database, `users/${safeKey}`), (snapshot) => {
+        onValue(userStatusRef, (snapshot) => {
             const uData = snapshot.val();
-            if (uData && uData.banned === true) {
-                alert("You have been banned from Global Chat.");
-                location.reload();
+            if (uData) {
+                if (uData.banned === true) {
+                    alert("You have been banned from Global Chat.");
+                    location.reload();
+                }
+                if (uData.tempBanUntil && uData.tempBanUntil > Date.now()) {
+                    alert(`You are temporarily banned until ${new Date(uData.tempBanUntil).toLocaleString()}`);
+                    location.reload();
+                }
+                if (uData.forcedName && uData.forcedName !== username) {
+                    username = uData.forcedName;
+                    localStorage.setItem("chatUsername", username);
+                    updateProfileUI();
+                }
             }
         });
 
@@ -1093,7 +1536,7 @@
         onDisconnect(userStatusRef).update({ online: false, lastActive: Date.now() });
     }
 
-    // Live Online Counter & Stats Dashboard
+    // Live Online Counter & Dashboard
     onValue(usersRef, (snapshot) => {
         const data = snapshot.val();
         let count = 0;
@@ -1126,66 +1569,267 @@
         announcementDisplay.textContent = val || "Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.";
     });
 
-    // MASTER OWNER PANEL JS CONTROLS
+    // MASTER OWNER PANEL JS HANDLERS
     ownerPanelBtn.addEventListener("click", () => {
         ownerModal.style.display = "flex";
         loadUserTable();
     });
 
-    closeOwnerBtn.addEventListener("click", () => { ownerModal.style.display = "none"; });
+    document.getElementById("closeOwnerBtn").addEventListener("click", () => { ownerModal.style.display = "none"; });
 
-    toggleLockBtn.addEventListener("click", async () => {
-        isChatLocked = !isChatLocked;
-        await set(ref(database, "config/locked"), isChatLocked);
-        alert(isChatLocked ? "Chat is now Locked." : "Chat is now Unlocked.");
+    // 1. Roles & Timed Sanctions
+    document.getElementById("saveRoleBtn").addEventListener("click", async () => {
+        const target = document.getElementById("targetUserInput").value.trim().replace(/[.#$[\]]/g, "_");
+        const role = document.getElementById("roleSelect").value;
+        if (target) {
+            await set(ref(database, `users/${target}/role`), role);
+            writeAuditLog(`Assigned role '${role}' to ${target}`);
+            alert(`Role updated for ${target}`);
+        }
     });
 
-    forceReloadBtn.addEventListener("click", async () => {
-        if (confirm("Force reload all connected users now?")) {
+    document.getElementById("saveBadgeBtn").addEventListener("click", async () => {
+        const target = document.getElementById("targetUserInput").value.trim().replace(/[.#$[\]]/g, "_");
+        const badge = document.getElementById("badgeTextInput").value.trim();
+        if (target) {
+            await set(ref(database, `users/${target}/badge`), badge);
+            writeAuditLog(`Assigned badge '${badge}' to ${target}`);
+            alert(`Badge updated for ${target}`);
+        }
+    });
+
+    document.getElementById("timedBanBtn").addEventListener("click", async () => {
+        const target = document.getElementById("targetUserInput").value.trim().replace(/[.#$[\]]/g, "_");
+        const seconds = parseInt(document.getElementById("sanctionTimeSelect").value);
+        if (target) {
+            const expiry = Date.now() + (seconds * 1000);
+            await set(ref(database, `users/${target}/tempBanUntil`), expiry);
+            writeAuditLog(`Applied timed ban on ${target} for ${seconds} seconds`);
+            alert(`Timed ban applied to ${target}`);
+        }
+    });
+
+    document.getElementById("timedMuteBtn").addEventListener("click", async () => {
+        const target = document.getElementById("targetUserInput").value.trim().replace(/[.#$[\]]/g, "_");
+        const seconds = parseInt(document.getElementById("sanctionTimeSelect").value);
+        if (target) {
+            const expiry = Date.now() + (seconds * 1000);
+            await set(ref(database, `users/${target}/tempMuteUntil`), expiry);
+            writeAuditLog(`Applied timed mute on ${target} for ${seconds} seconds`);
+            alert(`Timed mute applied to ${target}`);
+        }
+    });
+
+    document.getElementById("forceRenameBtn").addEventListener("click", async () => {
+        const target = document.getElementById("targetUserInput").value.trim().replace(/[.#$[\]]/g, "_");
+        const newName = document.getElementById("forceNewNameInput").value.trim();
+        if (target && newName) {
+            await set(ref(database, `users/${target}/forcedName`), newName);
+            writeAuditLog(`Forced name change on ${target} -> ${newName}`);
+            alert(`Forced rename queued for ${target}`);
+        }
+    });
+
+    // 2. Chat Controls & Media Toggles
+    document.getElementById("saveFilterBtn").addEventListener("click", async () => {
+        const words = bannedWordsInput.value.trim();
+        const action = document.getElementById("autoActionSelect").value;
+        await set(ref(database, "config/bannedWords"), words);
+        await set(ref(database, "config/autoAction"), action);
+        writeAuditLog(`Updated banned words filter and auto-action rule to '${action}'`);
+        alert("Keyword rules saved!");
+    });
+
+    document.getElementById("saveMediaTogglesBtn").addEventListener("click", async () => {
+        await set(ref(database, "config/mediaAllowed"), document.getElementById("toggleImages").checked);
+        await set(ref(database, "config/gifsAllowed"), document.getElementById("toggleGifs").checked);
+        await set(ref(database, "config/linksAllowed"), document.getElementById("toggleLinks").checked);
+        writeAuditLog("Updated Media & Link toggles");
+        alert("Media controls saved!");
+    });
+
+    document.getElementById("savePinnedBtn").addEventListener("click", async () => {
+        const val = document.getElementById("pinnedInput").value.trim();
+        await set(ref(database, "config/pinnedMessage"), val);
+        writeAuditLog(`Updated pinned announcement banner: "${val}"`);
+        alert("Pinned announcement saved!");
+    });
+
+    document.getElementById("clearPinnedBtn").addEventListener("click", async () => {
+        await remove(ref(database, "config/pinnedMessage"));
+        writeAuditLog("Cleared pinned message banner");
+    });
+
+    document.getElementById("loadDmLogsBtn").addEventListener("click", async () => {
+        const dmSnap = await get(ref(database, "dms"));
+        const box = document.getElementById("dmInspectorLogs");
+        box.innerHTML = "";
+        if (dmSnap.exists()) {
+            dmSnap.forEach(room => {
+                box.innerHTML += `<b style="color:#5865f2;">[Room: ${room.key}]</b><br>`;
+                room.forEach(msg => {
+                    const m = msg.val();
+                    box.innerHTML += `&nbsp;&nbsp;<b>${m.username}:</b> ${m.message || '[Attachment]'}<br>`;
+                });
+            });
+        } else {
+            box.innerHTML = "No private DM logs found.";
+        }
+    });
+
+    // Export Transcripts
+    document.getElementById("exportJsonBtn").addEventListener("click", async () => {
+        const snap = await get(messagesRef);
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(snap.val() || {}));
+        const dl = document.createElement("a");
+        dl.setAttribute("href", dataStr);
+        dl.setAttribute("download", `chat_transcript_${Date.now()}.json`);
+        dl.click();
+        writeAuditLog("Exported full chat transcript (JSON)");
+    });
+
+    document.getElementById("exportCsvBtn").addEventListener("click", async () => {
+        const snap = await get(messagesRef);
+        let csv = "Timestamp,Username,Message\n";
+        if (snap.exists()) {
+            snap.forEach(c => {
+                const m = c.val();
+                csv += `"${new Date(m.timestamp).toLocaleString()}","${m.username}","${(m.message || '').replace(/"/g, '""')}"\n`;
+            });
+        }
+        const dl = document.createElement("a");
+        dl.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
+        dl.setAttribute("download", `chat_transcript_${Date.now()}.csv`);
+        dl.click();
+        writeAuditLog("Exported full chat transcript (CSV)");
+    });
+
+    // 3. Theme & Cosmetics
+    document.getElementById("saveThemeBtn").addEventListener("click", async () => {
+        const theme = document.getElementById("themeSelect").value;
+        await set(ref(database, "config/theme"), theme);
+        writeAuditLog(`Changed global site theme to '${theme}'`);
+        alert("Global theme updated!");
+    });
+
+    document.getElementById("saveSoundBtn").addEventListener("click", async () => {
+        await set(ref(database, "config/soundFxEnabled"), document.getElementById("soundFxToggle").checked);
+        await set(ref(database, "config/soundType"), document.getElementById("soundTypeSelect").value);
+        writeAuditLog("Updated Chatroom Sound FX preferences");
+        alert("Sound FX configuration saved!");
+    });
+
+    document.getElementById("addEmojiBtn").addEventListener("click", async () => {
+        const code = document.getElementById("emojiShortcode").value.trim();
+        const url = document.getElementById("emojiUrl").value.trim();
+        if (code && url) {
+            const safeCode = code.replace(/[:.#$[\]]/g, "");
+            await set(ref(database, `customEmojis/${safeCode}`), url);
+            writeAuditLog(`Added custom emoji :${safeCode}:`);
+            alert(`Emoji :${safeCode}: added!`);
+        }
+    });
+
+    // 4. Security & Subnet Blocking
+    document.getElementById("blockSubnetBtn").addEventListener("click", async () => {
+        const sub = document.getElementById("subnetInput").value.trim();
+        if (sub) {
+            const safeSub = sub.replace(/[.#$[\]]/g, "_");
+            await set(ref(database, `blockedSubnets/${safeSub}`), true);
+            writeAuditLog(`Blocked IP Subnet range: ${sub}`);
+            alert(`Subnet ${sub} blocked!`);
+        }
+    });
+
+    document.getElementById("saveSecurityTogglesBtn").addEventListener("click", async () => {
+        await set(ref(database, "config/requireVerification"), document.getElementById("verificationToggle").checked);
+        await set(ref(database, "config/maintenanceMode"), document.getElementById("maintenanceToggle").checked);
+        writeAuditLog("Updated Security Verification & Maintenance toggles");
+        alert("Security policies updated!");
+    });
+
+    document.getElementById("saveSlowmodeBtn").addEventListener("click", async () => {
+        await set(ref(database, "config/slowmode"), parseInt(document.getElementById("slowmodeSelect").value));
+        writeAuditLog(`Updated rate-limiting slowmode cooldown`);
+        alert("Slowmode cooldown saved!");
+    });
+
+    // Backup & Restore
+    document.getElementById("backupDbBtn").addEventListener("click", async () => {
+        const snap = await get(ref(database));
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(snap.val() || {}));
+        const dl = document.createElement("a");
+        dl.setAttribute("href", dataStr);
+        dl.setAttribute("download", `database_backup_${Date.now()}.json`);
+        dl.click();
+        writeAuditLog("Downloaded database backup");
+    });
+
+    document.getElementById("restoreDbBtn").addEventListener("click", () => {
+        document.getElementById("restoreDbFileInput").click();
+    });
+
+    document.getElementById("restoreDbFileInput").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (confirm("OVERWRITE ENTIRE DATABASE with this backup?")) {
+                        await set(ref(database), parsed);
+                        writeAuditLog("RESTORED ENTIRE DATABASE FROM BACKUP JSON");
+                        alert("Database restore completed!");
+                    }
+                } catch (err) {
+                    alert("Invalid JSON backup file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    });
+
+    document.getElementById("kickAllSessionsBtn").addEventListener("click", async () => {
+        if (confirm("Force logout all users globally?")) {
             await set(ref(database, "config/forceReloadTrigger"), Date.now());
-        }
-    });
-
-    savePasscodeBtn.addEventListener("click", async () => {
-        const pass = newPasscodeInput.value.trim();
-        if (pass) {
-            await set(ref(database, "config/passcode"), pass);
-            newPasscodeInput.value = "";
-            alert("Custom passcode updated successfully!");
-        }
-    });
-
-    slowmodeSelect.addEventListener("change", async (e) => {
-        await set(ref(database, "config/slowmode"), parseInt(e.target.value));
-    });
-
-    saveFilterBtn.addEventListener("click", async () => {
-        await set(ref(database, "config/bannedWords"), bannedWordsInput.value.trim());
-        alert("Banned word filter updated!");
-    });
-
-    sendAlertBtn.addEventListener("click", async () => {
-        const text = newAnnouncementInput.value.trim();
-        if (text) {
-            await set(ref(database, "config/directAlert"), { text: text, timestamp: Date.now() });
-            alert("Popup alert sent to all online clients!");
-        }
-    });
-
-    saveAnnouncementBtn.addEventListener("click", async () => {
-        const text = newAnnouncementInput.value.trim();
-        if (text) {
-            await set(announcementRef, text);
-            newAnnouncementInput.value = "";
-            alert("Announcement updated!");
+            writeAuditLog("Triggered global session logout");
         }
     });
 
     clearChatBtn.addEventListener("click", async () => {
         if (confirm("Are you sure you want to delete ALL messages?")) {
             await set(messagesRef, null);
+            writeAuditLog("Cleared entire global chat history");
             alert("Chat history cleared.");
         }
+    });
+
+    // 5. Engagement & Games
+    document.getElementById("launchPollBtn").addEventListener("click", async () => {
+        const q = document.getElementById("pollQuestionInput").value.trim();
+        const opts = document.getElementById("pollOptionsInput").value.split(",").map(o => o.trim()).filter(o => o);
+        if (q && opts.length > 0) {
+            await set(ref(database, "activePoll"), { question: q, options: opts, votes: {} });
+            writeAuditLog(`Launched new chat poll: "${q}"`);
+            alert("Poll launched into main chat!");
+        }
+    });
+
+    document.getElementById("scheduleEventBtn").addEventListener("click", async () => {
+        const title = document.getElementById("eventTitleInput").value.trim();
+        const time = document.getElementById("eventTimeInput").value;
+        if (title && time) {
+            await set(ref(database, "config/scheduledEvent"), { title: title, time: time });
+            writeAuditLog(`Scheduled group event: "${title}" for ${time}`);
+            alert("Event scheduled!");
+        }
+    });
+
+    document.getElementById("saveMiniGamesBtn").addEventListener("click", async () => {
+        await set(ref(database, "config/triviaEnabled"), document.getElementById("toggleTrivia").checked);
+        await set(ref(database, "config/diceEnabled"), document.getElementById("toggleDice").checked);
+        writeAuditLog("Updated mini-game bot settings");
+        alert("Mini-game settings updated!");
     });
 
     function loadUserTable() {
@@ -1203,13 +1847,14 @@
 
                 const isBanned = user.banned || false;
                 const isMuted = user.muted || false;
+                const role = user.role || "User";
 
                 const statusHtml = isBanned ? "<span style='color:#f85149;'>Banned</span>" : (user.online ? "<span style='color:#3fb950;'>Online</span>" : "<span style='color:#8b949e;'>Offline</span>");
                 
                 tr.innerHTML = `
-                    <td><b>${user.username || key}</b> ${isMuted ? '🔇' : ''}</td>
+                    <td><b>${user.username || key}</b> ${user.badge ? `<span class='user-badge'>${user.badge}</span>` : ''} ${isMuted ? '🔇' : ''}</td>
+                    <td><span class='role-badge'>${role}</span></td>
                     <td>${user.ip || 'Unknown'}</td>
-                    <td>${user.device || 'Unknown'}</td>
                     <td>${statusHtml}</td>
                     <td>
                         <button class="action-sm-btn ${isBanned ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${key}', ${!isBanned})">${isBanned ? 'Unban' : 'Ban'}</button>
@@ -1224,10 +1869,12 @@
 
     window.toggleBan = async (key, shouldBan) => {
         await set(ref(database, `users/${key}/banned`), shouldBan);
+        writeAuditLog(`${shouldBan ? 'Banned' : 'Unbanned'} user key: ${key}`);
     };
 
     window.toggleMute = async (key, shouldMute) => {
         await set(ref(database, `users/${key}/muted`), shouldMute);
+        writeAuditLog(`${shouldMute ? 'Muted' : 'Unmuted'} user key: ${key}`);
     };
 
     window.purgeUserMessages = async (targetUsername) => {
@@ -1239,6 +1886,7 @@
                     remove(ref(database, `messages/${child.key}`));
                 }
             });
+            writeAuditLog(`Purged all messages from username: ${targetUsername}`);
             alert(`Purged messages from ${targetUsername}.`);
         }
     };
@@ -1376,7 +2024,10 @@
     const replyText = document.getElementById("replyText");
     const removeReply = document.getElementById("removeReply");
 
-    uploadBtn.addEventListener("click", () => fileInput.click());
+    uploadBtn.addEventListener("click", () => {
+        if (!mediaAllowed && !isOwner) return alert("Image attachments disabled by admin.");
+        fileInput.click();
+    });
 
     fileInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
@@ -1387,6 +2038,7 @@
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (let item of items) {
             if (item.type.indexOf("image") === 0) {
+                if (!mediaAllowed && !isOwner) return alert("Image attachments disabled by admin.");
                 const blob = item.getAsFile();
                 convertFileToBase64(blob);
             }
@@ -1491,8 +2143,12 @@
 
         const safeKey = username.replace(/[.#$[\]]/g, "_");
         const userSnap = await get(ref(database, `users/${safeKey}`));
-        if (userSnap.exists() && userSnap.val().muted === true) {
-            return alert("You are currently muted by an admin.");
+        if (userSnap.exists()) {
+            const uData = userSnap.val();
+            if (uData.muted === true) return alert("You are currently muted by an admin.");
+            if (uData.tempMuteUntil && uData.tempMuteUntil > Date.now()) {
+                return alert(`You are muted until ${new Date(uData.tempMuteUntil).toLocaleTimeString()}`);
+            }
         }
 
         if (slowmodeDelay > 0 && !isOwner) {
@@ -1503,17 +2159,42 @@
         }
 
         let text = messageInput.value.trim();
+
+        // Dice Roll command (/roll)
+        if (diceEnabled && text.startsWith("/roll")) {
+            const rollVal = Math.floor(Math.random() * 6) + 1;
+            text = `🎲 rolled a ${rollVal}!`;
+        }
+
+        // Link Toggle Check
+        if (!linksAllowed && !isOwner && text.match(/https?:\/\/[^\s]+/g)) {
+            return alert("External links are disabled by admin.");
+        }
+
         if (!text && !attachedImageBase64 && !attachedAudioBase64) return;
         if (!username) return alert("Choose a username first.");
 
-        // Banned Words Filter
+        // Banned Words Filter & Auto Strike System
+        let flagged = false;
         if (bannedWords.length > 0) {
             bannedWords.forEach(word => {
                 if (word && text.toLowerCase().includes(word)) {
+                    flagged = true;
                     const regex = new RegExp(word, "gi");
                     text = text.replace(regex, "****");
                 }
             });
+        }
+
+        if (flagged && !isOwner) {
+            strikes++;
+            alert(`Warning! Language flagged (${strikes}/3 strikes).`);
+            if (strikes >= 3) {
+                const autoAct = (await get(ref(database, "config/autoAction"))).val() || "mute";
+                await set(ref(database, `users/${safeKey}/${autoAct === "ban" ? "banned" : "muted"}`), true);
+                alert(`3 Strikes reached! You have been auto-${autoAct}d.`);
+                return;
+            }
         }
 
         try {
@@ -1558,6 +2239,33 @@
 
         subscribeTyping();
 
+        // Listen for Active Interactive Polls
+        onValue(ref(database, "activePoll"), (snapshot) => {
+            const p = snapshot.val();
+            const existingPoll = document.getElementById("activePollWidget");
+            if (existingPoll) existingPoll.remove();
+
+            if (p && p.question) {
+                const pCard = document.createElement("div");
+                pCard.id = "activePollWidget";
+                pCard.className = "poll-card";
+                pCard.innerHTML = `<b>📊 Community Poll: ${p.question}</b>`;
+                
+                (p.options || []).forEach((opt, idx) => {
+                    const votesCount = Object.values(p.votes || {}).filter(v => v === idx).length;
+                    const btn = document.createElement("button");
+                    btn.className = "poll-option-btn";
+                    btn.innerHTML = `<span>${opt}</span><b>${votesCount} votes</b>`;
+                    btn.onclick = async () => {
+                        const safeKey = username.replace(/[.#$[\]]/g, "_");
+                        await set(ref(database, `activePoll/votes/${safeKey}`), idx);
+                    };
+                    pCard.appendChild(btn);
+                });
+                messages.prepend(pCard);
+            }
+        });
+
         const recentMessages = query(
             messagesRef,
             orderByChild("timestamp"),
@@ -1584,7 +2292,7 @@
 
     loadRoomMessages("global");
 
-    function displayMessage(data, key) {
+    async function displayMessage(data, key) {
         const message = document.createElement("div");
         message.className = "message";
         message.id = "msg-" + key;
@@ -1610,6 +2318,27 @@
         name.className = "username";
         name.textContent = data.username;
 
+        top.appendChild(name);
+
+        // Render user custom badge and role
+        const safeKey = (data.username || "").replace(/[.#$[\]]/g, "_");
+        const uSnap = await get(ref(database, `users/${safeKey}`));
+        if (uSnap.exists()) {
+            const uInfo = uSnap.val();
+            if (uInfo.role && uInfo.role !== "User") {
+                const rTag = document.createElement("span");
+                rTag.className = "role-badge";
+                rTag.textContent = uInfo.role;
+                top.appendChild(rTag);
+            }
+            if (uInfo.badge) {
+                const bTag = document.createElement("span");
+                bTag.className = "user-badge";
+                bTag.textContent = uInfo.badge;
+                top.appendChild(bTag);
+            }
+        }
+
         const time = document.createElement("span");
         time.className = "time";
         time.textContent = new Date(data.timestamp).toLocaleTimeString([], {
@@ -1617,7 +2346,6 @@
             minute: "2-digit"
         });
 
-        top.appendChild(name);
         top.appendChild(time);
 
         const replyBtn = document.createElement("button");
@@ -1720,7 +2448,7 @@
 
     closeDmBtn.addEventListener("click", () => dmModal.style.display = "none");
 
-    // FULL MULTI-PARTY MESH WEBRTC CALL ENGINE
+    // MULTI-PARTY WEBRTC CALL ENGINE
     const callBtn = document.getElementById("callBtn");
     const callModal = document.getElementById("callModal");
     const leaveCallBtn = document.getElementById("leaveCallBtn");
@@ -1732,7 +2460,7 @@
     const callGrid = document.getElementById("callGrid");
 
     let localStream = null;
-    let peers = {}; // Stores RTCPeerConnection for each active remote user
+    let peers = {};
     let isMicOn = true;
     let isCamOn = true;
 
@@ -1744,7 +2472,6 @@
         ] 
     };
 
-    // Listen for Global Incoming Calls Banner
     onValue(ref(database, "calls/global/status"), (snapshot) => {
         const callData = snapshot.val();
         if (callData && callData.isCalling && callData.caller !== username) {
@@ -1767,7 +2494,6 @@
         try {
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             
-            // Re-initialize Call Grid UI with local video
             callGrid.innerHTML = `
                 <div class="video-box" id="localVideoBox">
                     <video id="localVideo" autoplay muted playsinline></video>
@@ -1778,18 +2504,15 @@
 
             const safeKey = username.replace(/[.#$[\]]/g, "_");
 
-            // Announce global calling status for top banner
             set(ref(database, "calls/global/status"), {
                 caller: username,
                 isCalling: true
             });
 
-            // Register in participants list
             const myParticipantRef = ref(database, `calls/global/participants/${safeKey}`);
             await set(myParticipantRef, { username: username, joined: Date.now() });
             onDisconnect(myParticipantRef).remove();
 
-            // Listen for all call participants
             onValue(ref(database, "calls/global/participants"), (snapshot) => {
                 const participants = snapshot.val() || {};
                 const keys = Object.keys(participants);
@@ -1800,7 +2523,6 @@
                     }
                 });
 
-                // Clean up any disconnected peers
                 Object.keys(peers).forEach(pKey => {
                     if (!participants[pKey]) {
                         removePeerConnection(pKey);
@@ -1861,7 +2583,6 @@
             }
         };
 
-        // Deterministic signaling path based on alphabetical order to prevent collisions
         const isInitiator = myKey < otherKey;
         const signalPath = isInitiator 
             ? `calls/global/signals/${myKey}_vs_${otherKey}`
@@ -1944,10 +2665,8 @@
     leaveCallBtn.addEventListener("click", async () => {
         const safeKey = username.replace(/[.#$[\]]/g, "_");
         
-        // Remove self from participants
         await remove(ref(database, `calls/global/participants/${safeKey}`));
 
-        // Close all peer connections
         Object.keys(peers).forEach(pKey => removePeerConnection(pKey));
 
         if (localStream) {
@@ -1955,7 +2674,6 @@
             localStream = null;
         }
 
-        // Check if no participants left to clear caller banner status
         const pSnap = await get(ref(database, "calls/global/participants"));
         if (!pSnap.exists() || Object.keys(pSnap.val()).length === 0) {
             await remove(ref(database, "calls/global"));
