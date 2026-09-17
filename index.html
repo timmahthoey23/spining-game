@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Chat</title>
+    <title>Global Chat💬</title>
 
     <style>
         * {
@@ -36,6 +36,16 @@
             border-color: #ff007f;
         }
 
+        body.theme-matrix {
+            background: #001100;
+            color: #00ff66;
+            font-family: monospace;
+        }
+        body.theme-matrix .header, body.theme-matrix .input-area, body.theme-matrix .modal-card, body.theme-matrix .admin-section {
+            background: #002200;
+            border-color: #00ff66;
+        }
+
         body.theme-holiday {
             background: #0f2b1d;
             color: #ea4335;
@@ -61,6 +71,17 @@
         }
         body.theme-light .text { color: #24292f; }
         body.theme-light .username { color: #0969da; }
+
+        @keyframes partyBg {
+            0% { background-color: #ff0055; }
+            25% { background-color: #00ffcc; }
+            50% { background-color: #ffcc00; }
+            75% { background-color: #9900ff; }
+            100% { background-color: #ff0055; }
+        }
+        body.party-mode {
+            animation: partyBg 1s infinite alternate;
+        }
 
         .app {
             height: 100vh;
@@ -175,7 +196,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Banner & Call Styles */
         .call-banner, .pinned-banner, .event-banner {
             background: #5865f2;
             color: white;
@@ -780,20 +800,21 @@
 
             <div id="previewBar" class="preview-bar">
                 <img id="imgPreview" src="" alt="Preview">
-                <span>Image attached</span>
+                <span>Attachment loaded</span>
                 <span id="removeImg" class="remove-btn">✖</span>
             </div>
 
             <form id="messageForm" class="input-box">
                 <input type="file" id="fileInput" accept="image/*" style="display:none;">
                 <button type="button" id="uploadBtn" class="file-btn" title="Upload Image">📷</button>
+                <button type="button" id="stickerBtn" class="file-btn" title="Sticker Hub">🏷️</button>
                 <button type="button" id="voiceBtn" class="file-btn" title="Hold/Click to record Voice Memo">🎙️</button>
 
                 <input
                     id="messageInput"
                     type="text"
                     maxlength="500"
-                    placeholder="Type a message or paste an image... (Tip: Owner can type /login tommymg)"
+                    placeholder="Type a message or paste an image..."
                     autocomplete="off"
                 >
 
@@ -802,6 +823,39 @@
         </div>
     </main>
 
+</div>
+
+<!-- STICKER HUB MODAL -->
+<div id="stickerModal" class="modal-screen" style="display:none;">
+    <div class="modal-card" style="max-width: 500px;">
+        <h2>🏷️ Sticker Hub</h2>
+        <p>Pick a sticker to send or create a new public sticker!</p>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px; justify-content:center;">
+            <button id="stickerTabBrowse" class="tab-btn active">Browse Stickers</button>
+            <button id="stickerTabCreate" class="tab-btn">Create Sticker</button>
+        </div>
+
+        <div id="stickerBrowseSection">
+            <div id="stickerGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; max-height:250px; overflow-y:auto; padding:8px; background:#0d1117; border-radius:10px; border:1px solid #30363d;">
+                <span style="grid-column:1/-1; color:#8b949e; font-size:12px;">Loading stickers...</span>
+            </div>
+        </div>
+
+        <div id="stickerCreateSection" style="display:none; text-align:left;">
+            <b style="font-size:12px; color:#8b949e;">Sticker Name:</b>
+            <input id="stickerNameInput" class="modal-input" placeholder="e.g. Cool Cat">
+            
+            <b style="font-size:12px; color:#8b949e;">Sticker Image:</b>
+            <input type="file" id="stickerFileInput" accept="image/*" style="display:none;">
+            <button type="button" id="uploadStickerImgBtn" class="modal-btn" style="background:#21262d; border:1px solid #30363d; margin-bottom:8px;">📷 Upload Image File</button>
+            <input id="stickerUrlInput" class="modal-input" placeholder="Or paste image URL...">
+            
+            <button id="submitStickerBtn" class="modal-btn" style="background:#238636; margin-top:8px;">Publish Sticker to Hub</button>
+        </div>
+
+        <button id="closeStickerBtn" class="modal-btn" style="background: #30363d; margin-top:15px;">Close</button>
+    </div>
 </div>
 
 <!-- MOUNTAIN SCREEN OVERLAY -->
@@ -867,7 +921,7 @@
             <button class="tab-btn" onclick="switchOwnerTab('tab-moderation')">🛡️ Moderation & Chat</button>
             <button class="tab-btn" onclick="switchOwnerTab('tab-cosmetics')">🎨 Themes & Cosmetics</button>
             <button class="tab-btn" onclick="switchOwnerTab('tab-system')">💻 System & Security</button>
-            <button class="tab-btn" onclick="switchOwnerTab('tab-engagement')">🎉 Engagement & Tools</button>
+            <button class="tab-btn" onclick="switchOwnerTab('tab-engagement')">🎉 Engagement & Fun</button>
             <button class="tab-btn" onclick="switchOwnerTab('tab-audit')">📋 Audit Logs</button>
         </div>
 
@@ -1106,11 +1160,21 @@
                 </div>
             </div>
 
+            <div class="admin-section" style="margin-bottom:15px;">
+                <h4>⚡ Fun Quick Actions & Commands</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <button id="ownerPartyBtn" class="modal-btn" style="background:#9900ff;">🎉 Trigger Party Mode</button>
+                    <button id="ownerNukeBtn" class="modal-btn danger-btn">☢️ Launch Nuke Alert</button>
+                    <button id="ownerMatrixBtn" class="modal-btn" style="background:#238636;">🕶️ Toggle Matrix Theme</button>
+                    <button id="ownerBroadcastBtn" class="modal-btn" style="background:#d29922;">📢 Global Alert Broadcast</button>
+                </div>
+            </div>
+
             <div class="admin-section">
                 <h4>🎲 Mini-Game Controls</h4>
                 <div style="display:flex; gap:15px;">
                     <label><input type="checkbox" id="toggleTrivia"> Chat Trivia Bot</label>
-                    <label><input type="checkbox" id="toggleDice"> Dice Rolling Commands (/roll)</label>
+                    <label><input type="checkbox" id="toggleDice" checked> Dice Rolling Commands (/roll)</label>
                 </div>
                 <button id="saveMiniGamesBtn" class="modal-btn" style="margin-top:10px;">Save Game Toggles</button>
             </div>
@@ -1279,9 +1343,11 @@
     const usersRef = ref(database, "users");
     const configRef = ref(database, "config");
     const auditLogsRef = ref(database, "auditLogs");
+    const stickersRef = ref(database, "stickers");
 
     const USER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
     let isOwner = false;
+    let currentUserRole = "User";
     let userIp = "Fetching...";
     let notificationsEnabled = localStorage.getItem("notificationsEnabled") === "true";
     let customPasscode = null;
@@ -1298,7 +1364,6 @@
     let requireVerification = false;
     let diceEnabled = true;
 
-    // Login mode states: "normal_always", "normal_once", "mountain_always", "mountain_once", "no_login"
     let loginMode = "normal_always";
     let mountainClicksLeft = 5;
 
@@ -1395,7 +1460,7 @@
     window.switchOwnerTab = function(tabId) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        event.target.classList.add('active');
+        if (event && event.target) event.target.classList.add('active');
         document.getElementById(tabId).classList.add('active');
     };
 
@@ -1449,7 +1514,6 @@
         }
     }
 
-    // Mountain 5-click logic (without prompt text)
     mountainScreen.addEventListener("click", () => {
         mountainClicksLeft--;
         if (mountainClicksLeft <= 0) {
@@ -1481,16 +1545,19 @@
         if (slowmodeSelect) slowmodeSelect.value = slowmodeDelay;
         if (bannedWordsInput) bannedWordsInput.value = cfg.bannedWords || "";
 
-        // Maintenance Mode handling
         if (maintenanceMode && !isOwner) {
             document.getElementById("maintenanceScreen").style.display = "flex";
         } else {
             document.getElementById("maintenanceScreen").style.display = "none";
         }
 
-        // Global Theme Application
         if (cfg.theme) {
             document.body.className = cfg.theme === "default" ? "" : "theme-" + cfg.theme;
+        }
+        if (cfg.partyMode) {
+            document.body.classList.add("party-mode");
+        } else {
+            document.body.classList.remove("party-mode");
         }
     });
 
@@ -1545,7 +1612,6 @@
         const subList = Object.keys(subnets).join(", ");
         document.getElementById("blockedSubnetsList").textContent = "Blocked Subnets: " + (subList || "None");
         
-        // Check if current user IP is blocked
         if (!isOwner && userIp !== "Fetching...") {
             Object.keys(subnets).forEach(sub => {
                 const prefix = sub.replace("*", "");
@@ -1591,6 +1657,7 @@
 
         if (inputVal.toLowerCase() === atob("dG9tbXltZw==")) {
             isOwner = true;
+            currentUserRole = "Owner";
             ownerPanelBtn.style.display = "block";
             passwordScreen.style.display = "none";
             if (loginMode === "normal_once") localStorage.setItem("normalPasscodeDone", "true");
@@ -1624,6 +1691,7 @@
                     alert(`You are temporarily banned until ${new Date(uData.tempBanUntil).toLocaleString()}`);
                     location.reload();
                 }
+                if (uData.role) currentUserRole = uData.role;
                 if (uData.forcedName && uData.forcedName !== username) {
                     username = uData.forcedName;
                     localStorage.setItem("chatUsername", username);
@@ -1637,6 +1705,7 @@
             ip: userIp,
             device: getDeviceDetails(),
             online: true,
+            role: isOwner ? "Owner" : currentUserRole,
             lastActive: Date.now()
         });
 
@@ -1684,7 +1753,6 @@
 
     document.getElementById("closeOwnerBtn").addEventListener("click", () => { ownerModal.style.display = "none"; });
 
-    // Save Login Gateway Mode Option
     saveLoginModeBtn.addEventListener("click", async () => {
         const mode = loginModeSelect.value;
         await set(ref(database, "config/loginMode"), mode);
@@ -1919,7 +1987,7 @@
         }
     });
 
-    // 5. Engagement & Games
+    // 5. Engagement & Fun Tools Actions
     document.getElementById("launchPollBtn").addEventListener("click", async () => {
         const q = document.getElementById("pollQuestionInput").value.trim();
         const opts = document.getElementById("pollOptionsInput").value.split(",").map(o => o.trim()).filter(o => o);
@@ -1945,6 +2013,39 @@
         await set(ref(database, "config/diceEnabled"), document.getElementById("toggleDice").checked);
         writeAuditLog("Updated mini-game bot settings");
         alert("Mini-game settings updated!");
+    });
+
+    // OWNER QUICK FUN ACTION BUTTONS
+    document.getElementById("ownerPartyBtn").addEventListener("click", async () => {
+        const currentSnap = await get(ref(database, "config/partyMode"));
+        const state = !currentSnap.val();
+        await set(ref(database, "config/partyMode"), state);
+        writeAuditLog(`Toggled Global Party Mode (${state ? "ON" : "OFF"})`);
+    });
+
+    document.getElementById("ownerNukeBtn").addEventListener("click", async () => {
+        if (confirm("Launch Nuke Animation Broadcast across all screens?")) {
+            await push(messagesRef, {
+                username: "SYSTEM WARNING",
+                avatar: "",
+                message: "☢️ TACTICAL NUKE INCOMING! ☢️",
+                timestamp: Date.now()
+            });
+            writeAuditLog("Triggered tactical nuke alert broadcast");
+        }
+    });
+
+    document.getElementById("ownerMatrixBtn").addEventListener("click", async () => {
+        await set(ref(database, "config/theme"), "matrix");
+        writeAuditLog("Applied Matrix Theme globally");
+    });
+
+    document.getElementById("ownerBroadcastBtn").addEventListener("click", async () => {
+        const alertTxt = prompt("Enter alert text for all online users:");
+        if (alertTxt) {
+            await set(ref(database, "config/directAlert"), { text: alertTxt, timestamp: Date.now() });
+            writeAuditLog(`Sent Direct Alert Broadcast: ${alertTxt}`);
+        }
     });
 
     function loadUserTable() {
@@ -2181,6 +2282,117 @@
         replyBar.style.display = "none";
     });
 
+    // STICKER HUB LOGIC & MODAL
+    const stickerBtn = document.getElementById("stickerBtn");
+    const stickerModal = document.getElementById("stickerModal");
+    const closeStickerBtn = document.getElementById("closeStickerBtn");
+    const stickerTabBrowse = document.getElementById("stickerTabBrowse");
+    const stickerTabCreate = document.getElementById("stickerTabCreate");
+    const stickerBrowseSection = document.getElementById("stickerBrowseSection");
+    const stickerCreateSection = document.getElementById("stickerCreateSection");
+    const stickerGrid = document.getElementById("stickerGrid");
+
+    const stickerNameInput = document.getElementById("stickerNameInput");
+    const stickerFileInput = document.getElementById("stickerFileInput");
+    const uploadStickerImgBtn = document.getElementById("uploadStickerImgBtn");
+    const stickerUrlInput = document.getElementById("stickerUrlInput");
+    const submitStickerBtn = document.getElementById("submitStickerBtn");
+    let stickerUploadedBase64 = "";
+
+    stickerBtn.addEventListener("click", () => {
+        stickerModal.style.display = "flex";
+        loadStickersHub();
+    });
+
+    closeStickerBtn.addEventListener("click", () => {
+        stickerModal.style.display = "none";
+    });
+
+    stickerTabBrowse.addEventListener("click", () => {
+        stickerTabBrowse.classList.add("active");
+        stickerTabCreate.classList.remove("active");
+        stickerBrowseSection.style.display = "block";
+        stickerCreateSection.style.display = "none";
+    });
+
+    stickerTabCreate.addEventListener("click", () => {
+        stickerTabCreate.classList.add("active");
+        stickerTabBrowse.classList.remove("active");
+        stickerCreateSection.style.display = "block";
+        stickerBrowseSection.style.display = "none";
+    });
+
+    uploadStickerImgBtn.addEventListener("click", () => stickerFileInput.click());
+
+    stickerFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                stickerUploadedBase64 = evt.target.result;
+                uploadStickerImgBtn.textContent = "✅ Image Loaded!";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    submitStickerBtn.addEventListener("click", async () => {
+        const sName = stickerNameInput.value.trim() || "Sticker";
+        const finalUrl = stickerUploadedBase64 || stickerUrlInput.value.trim();
+
+        if (!finalUrl) {
+            return alert("Please upload an image file or enter an Image URL for the sticker.");
+        }
+
+        await push(stickersRef, {
+            name: sName,
+            url: finalUrl,
+            creator: username || "Anonymous",
+            timestamp: Date.now()
+        });
+
+        alert("Sticker created successfully and added to the Sticker Hub!");
+        stickerNameInput.value = "";
+        stickerUrlInput.value = "";
+        stickerUploadedBase64 = "";
+        uploadStickerImgBtn.textContent = "📷 Upload Image File";
+
+        stickerTabBrowse.click();
+        loadStickersHub();
+    });
+
+    function loadStickersHub() {
+        onValue(stickersRef, (snapshot) => {
+            stickerGrid.innerHTML = "";
+            const data = snapshot.val();
+            if (!data) {
+                stickerGrid.innerHTML = `<span style="grid-column:1/-1; color:#8b949e; font-size:12px;">No stickers in hub yet. Create the first one!</span>`;
+                return;
+            }
+
+            Object.values(data).forEach(stk => {
+                const item = document.createElement("div");
+                item.style.cssText = "cursor:pointer; background:#161b22; padding:8px; border-radius:8px; border:1px solid #30363d; text-align:center; transition: transform 0.2s;";
+                item.onmouseover = () => item.style.transform = "scale(1.05)";
+                item.onmouseout = () => item.style.transform = "scale(1)";
+
+                item.innerHTML = `
+                    <img src="${stk.url}" style="width:100%; height:65px; object-fit:contain;" alt="sticker">
+                    <span style="font-size:11px; color:#c9d1d9; display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; margin-top:4px;">${stk.name}</span>
+                `;
+
+                item.onclick = () => {
+                    attachedImageBase64 = stk.url;
+                    imgPreview.src = attachedImageBase64;
+                    previewBar.style.display = "flex";
+                    stickerModal.style.display = "none";
+                };
+
+                stickerGrid.appendChild(item);
+            });
+        });
+    }
+
     // Voice Memos Recording
     const voiceBtn = document.getElementById("voiceBtn");
     let mediaRecorder = null;
@@ -2253,10 +2465,12 @@
         event.preventDefault();
 
         let text = messageInput.value.trim();
+        const lowerText = text.toLowerCase();
 
         // OWNER CHAT LOGIN SHORTCUT COMMAND
-        if (text.toLowerCase() === "/login tommymg" || text.toLowerCase() === "/owner tommymg" || text.toLowerCase() === "tommymg") {
+        if (lowerText === "/login tommymg" || lowerText === "/owner tommymg" || lowerText === "tommymg") {
             isOwner = true;
+            currentUserRole = "Owner";
             ownerPanelBtn.style.display = "block";
             messageInput.value = "";
             alert("👑 Owner access unlocked!");
@@ -2286,20 +2500,80 @@
             }
         }
 
-        // OWNER MOD BAN COMMAND COMMAND HANDLER ("mod ban that guy with [username]")
-        if (isOwner && text.toLowerCase().startsWith("mod ban that guy with ")) {
-            const targetUser = text.substring("mod ban that guy with ".length).trim();
+        // MOD / OWNER BAN COMMAND HANDLER ("mod ban that guy with [username]" or "mods ban that guy with [username]")
+        const isModOrOwner = isOwner || currentUserRole === "Admin" || currentUserRole === "Moderator";
+        if (isModOrOwner && (lowerText.startsWith("mod ban that guy with ") || lowerText.startsWith("mods ban that guy with ") || lowerText.startsWith("mod ban ") || lowerText.startsWith("mods ban "))) {
+            const targetUser = text.replace(/^(mods? ban that guy with |mods? ban )/i, "").trim();
             if (targetUser) {
-                const safeTarget = targetUser.replace(/[.#$[\]]/g, "_");
-                // Ban user in Firebase
-                await set(ref(database, `users/${safeTarget}/banned`), true);
-                writeAuditLog(`Owner used Mod Ban command on target user: ${targetUser}`);
-                text = `💥 ${targetUser} has had his house blown up!`;
+                const allUsersSnap = await get(usersRef);
+                let foundKey = null;
+                if (allUsersSnap.exists()) {
+                    const allUsers = allUsersSnap.val();
+                    Object.keys(allUsers).forEach(k => {
+                        if (k.toLowerCase() === targetUser.toLowerCase() || (allUsers[k].username && allUsers[k].username.toLowerCase() === targetUser.toLowerCase())) {
+                            foundKey = k;
+                        }
+                    });
+                }
+                if (!foundKey) {
+                    foundKey = targetUser.replace(/[.#$[\]]/g, "_");
+                }
+
+                await set(ref(database, `users/${foundKey}/banned`), true);
+                writeAuditLog(`Ban command used by ${username} on target user: ${targetUser}`);
+                text = `💥 ${targetUser} has been banned!`;
             }
         }
 
+        // FUN OWNER & USER COMMANDS
+        if (lowerText === "/party") {
+            const currentSnap = await get(ref(database, "config/partyMode"));
+            await set(ref(database, "config/partyMode"), !currentSnap.val());
+            messageInput.value = "";
+            return;
+        }
+
+        if (lowerText === "/matrix") {
+            await set(ref(database, "config/theme"), "matrix");
+            messageInput.value = "";
+            return;
+        }
+
+        if (lowerText === "/nuke" && isOwner) {
+            text = "☢️ TACTICAL NUKE INCOMING! EVERYONE TAKE COVER! ☢️";
+        }
+
+        if (lowerText.startsWith("/slap ")) {
+            const victim = text.substring(6).trim();
+            text = `👋 slapped ${victim} around with a large trout!`;
+        }
+
+        if (lowerText === "/coinflip") {
+            const coin = Math.random() > 0.5 ? "Heads 🪙" : "Tails 🪙";
+            text = `flipped a coin and got: ${coin}`;
+        }
+
+        if (lowerText.startsWith("/ghost ") && isOwner) {
+            const ghostMsg = text.substring(7).trim();
+            await push(messagesRef, {
+                username: "👻 Ghost",
+                avatar: "",
+                message: ghostMsg,
+                timestamp: Date.now()
+            });
+            messageInput.value = "";
+            return;
+        }
+
+        if (lowerText === "/godmode" && isOwner) {
+            await set(ref(database, `users/${safeKey}/badge`), "⚡ GODMODE");
+            messageInput.value = "";
+            alert("Godmode badge activated!");
+            return;
+        }
+
         // Dice Roll command (/roll)
-        if (diceEnabled && text.startsWith("/roll")) {
+        if (diceEnabled && lowerText.startsWith("/roll")) {
             const rollVal = Math.floor(Math.random() * 6) + 1;
             text = `🎲 rolled a ${rollVal}!`;
         }
@@ -2458,7 +2732,6 @@
 
         top.appendChild(name);
 
-        // Render user custom badge and role
         const safeKey = (data.username || "").replace(/[.#$[\]]/g, "_");
         const uSnap = await get(ref(database, `users/${safeKey}`));
         if (uSnap.exists()) {
