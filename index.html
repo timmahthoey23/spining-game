@@ -241,6 +241,7 @@
             gap: 12px;
             margin-bottom: 18px;
             animation: appear 0.2s ease;
+            position: relative;
         }
 
         @keyframes appear {
@@ -260,6 +261,8 @@
             font-weight: bold;
             font-size: 17px;
             overflow: hidden;
+            position: relative;
+            transition: opacity 0.3s;
         }
 
         .avatar img {
@@ -335,6 +338,53 @@
             margin-top: 8px;
             display: block;
         }
+
+        /* Embed Styles */
+        .embed-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-left: 4px solid #5865f2;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            max-width: 400px;
+        }
+        .embed-card.tiktok { border-left-color: #ff0050; }
+        .embed-card.spotify { border-left-color: #1db954; }
+        .embed-title { font-weight: bold; font-size: 13px; color: #f0f6fc; margin-bottom: 4px; }
+        .embed-desc { font-size: 12px; color: #8b949e; word-break: break-all; }
+
+        /* Reaction Picker & Container */
+        .reactions-container {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .reaction-badge {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            user-select: none;
+        }
+        .reaction-badge:hover { border-color: #5865f2; }
+        .reaction-badge.active { background: #383f47; border-color: #5865f2; }
+
+        .reaction-picker-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .reaction-picker-btn:hover { opacity: 1; }
 
         .quoted-reply {
             background: #21262d;
@@ -739,6 +789,16 @@
 
         .control-btn.active { background: #da3633; }
 
+        /* Shatter Animation Fragment Styles */
+        .shatter-fragment {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            background-size: cover;
+            transition: transform 1.2s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 1.2s ease-out;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0d1117; }
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
@@ -780,7 +840,10 @@
 
     <div id="eventSchedulerBanner" class="event-banner" style="display:none;">
         <span>📅 <b id="eventBannerText">Upcoming Event</b></span>
-        <span id="eventTimerText"></span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="eventTimerText"></span>
+            <button id="removeEventBtn" style="background:none; border:none; color:#0d1117; cursor:pointer; font-weight:bold; font-size:14px;" title="Remove Event">✖</button>
+        </div>
     </div>
 
     <div id="incomingCallBanner" class="call-banner" style="display:none;">
@@ -1174,7 +1237,10 @@
                     <h4>📅 Event Scheduler</h4>
                     <input id="eventTitleInput" class="modal-input" placeholder="Event Name...">
                     <input id="eventTimeInput" class="modal-input" type="datetime-local">
-                    <button id="scheduleEventBtn" class="modal-btn">Schedule Top Banner Event</button>
+                    <div style="display:flex; gap:6px;">
+                        <button id="scheduleEventBtn" class="modal-btn">Schedule Top Banner Event</button>
+                        <button id="cancelEventBtn" class="modal-btn danger-btn" style="width: auto;">Remove Event</button>
+                    </div>
                 </div>
             </div>
 
@@ -1332,7 +1398,8 @@
         remove,
         onChildRemoved,
         onDisconnect,
-        get
+        get,
+        update
     }
         from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
@@ -1602,6 +1669,79 @@
             banner.style.display = "none";
         }
     });
+
+    // Remove Scheduled Event Listeners
+    document.getElementById("removeEventBtn").addEventListener("click", removeScheduledEvent);
+    document.getElementById("cancelEventBtn").addEventListener("click", removeScheduledEvent);
+
+    async function removeScheduledEvent() {
+        await remove(ref(database, "config/scheduledEvent"));
+        writeAuditLog("Removed scheduled banner event");
+        alert("Scheduled event removed.");
+    }
+
+    // Listen for Shatter Effect Command Signal
+    onValue(ref(database, "config/shatterSignal"), (snap) => {
+        const val = snap.val();
+        if (val && val.timestamp > window.loadedTime) {
+            triggerShatterEffect(val.targetUser);
+        }
+    });
+
+    // Shatter Animation Function
+    function triggerShatterEffect(targetUsername) {
+        const msgElements = document.querySelectorAll('.message');
+        msgElements.forEach(msgEl => {
+            const userSpan = msgEl.querySelector('.username');
+            if (userSpan && userSpan.textContent.toLowerCase() === targetUsername.toLowerCase()) {
+                const avatarEl = msgEl.querySelector('.avatar');
+                if (avatarEl && avatarEl.style.opacity !== "0") {
+                    const rect = avatarEl.getBoundingClientRect();
+                    avatarEl.style.opacity = "0";
+
+                    const rows = 4, cols = 4;
+                    const pieceWidth = rect.width / cols;
+                    const pieceHeight = rect.height / rows;
+
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            const fragment = document.createElement('div');
+                            fragment.className = 'shatter-fragment';
+                            fragment.style.width = pieceWidth + 'px';
+                            fragment.style.height = pieceHeight + 'px';
+                            fragment.style.left = (rect.left + c * pieceWidth) + 'px';
+                            fragment.style.top = (rect.top + r * pieceHeight) + 'px';
+
+                            const img = avatarEl.querySelector('img');
+                            if (img) {
+                                fragment.style.backgroundImage = `url(${img.src})`;
+                                fragment.style.backgroundPosition = `-${c * pieceWidth}px -${r * pieceHeight}px`;
+                                fragment.style.backgroundSize = `${rect.width}px ${rect.height}px`;
+                            } else {
+                                fragment.style.backgroundColor = '#5865f2';
+                                fragment.style.borderRadius = '4px';
+                            }
+
+                            document.body.appendChild(fragment);
+
+                            const angle = Math.random() * Math.PI * 2;
+                            const distance = 150 + Math.random() * 200;
+                            const x = Math.cos(angle) * distance;
+                            const y = Math.sin(angle) * distance;
+                            const rot = (Math.random() - 0.5) * 720;
+
+                            requestAnimationFrame(() => {
+                                fragment.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(0.2)`;
+                                fragment.style.opacity = '0';
+                            });
+
+                            setTimeout(() => fragment.remove(), 1200);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     // Audit Logs Realtime Listener
     onValue(auditLogsRef, (snapshot) => {
@@ -2496,6 +2636,24 @@
             return;
         }
 
+        // OWNER SHATTER COMMAND
+        if (lowerText.startsWith("/shatter ")) {
+            if (!isOwner) {
+                alert("Only the owner can use this command.");
+                return;
+            }
+            const targetUser = text.substring(9).trim();
+            if (targetUser) {
+                await set(ref(database, "config/shatterSignal"), {
+                    targetUser: targetUser,
+                    timestamp: Date.now()
+                });
+                writeAuditLog(`Owner shattered avatar of ${targetUser}`);
+                messageInput.value = "";
+                return;
+            }
+        }
+
         if (isChatLocked && !isOwner) {
             return alert("Chat is currently locked in read-only mode by admin.");
         }
@@ -2517,7 +2675,7 @@
             }
         }
 
-        // MOD / OWNER BAN COMMAND HANDLER ("mods ban that guy [username]", "mod ban that guy with [username]", etc.)
+        // MOD / OWNER BAN COMMAND HANDLER
         const isModOrOwner = isOwner || currentUserRole === "Admin" || currentUserRole === "Moderator";
         if (isModOrOwner && (lowerText.startsWith("mods ban that guy ") || lowerText.startsWith("mod ban that guy ") || lowerText.startsWith("mods ban that guy with ") || lowerText.startsWith("mod ban that guy with ") || lowerText.startsWith("mod ban ") || lowerText.startsWith("mods ban "))) {
             const targetUser = text.replace(/^(mods? ban that guy( with)? |mods? ban )/i, "").trim();
@@ -2651,7 +2809,7 @@
 
         subscribeTyping();
 
-        // Listen for Active Interactive Polls (Render at the bottom)
+        // Listen for Active Interactive Polls
         onValue(ref(database, "activePoll"), (snapshot) => {
             const p = snapshot.val();
             const existingPoll = document.getElementById("activePollWidget");
@@ -2734,7 +2892,6 @@
 
         top.appendChild(name);
 
-        // Instant synchronous role/badge check using memory cache
         const safeKey = (data.username || "").replace(/[.#$[\]]/g, "_");
         const uInfo = cachedUsers[safeKey];
         if (uInfo) {
@@ -2756,6 +2913,17 @@
         time.className = "time";
         time.textContent = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
         top.appendChild(time);
+
+        // Add Reaction Picker Button
+        const reactBtn = document.createElement("button");
+        reactBtn.className = "reaction-picker-btn";
+        reactBtn.textContent = "➕";
+        reactBtn.title = "Add Reaction";
+        reactBtn.onclick = () => {
+            const emoji = prompt("Enter an emoji to react with:", "❤️");
+            if (emoji) toggleReaction(key, emoji);
+        };
+        top.appendChild(reactBtn);
 
         if (isOwner) {
             const delBtn = document.createElement("button");
@@ -2779,6 +2947,9 @@
             txt.className = "text";
             txt.textContent = data.message;
             content.appendChild(txt);
+
+            // Expand Links (TikTok, Spotify, Images, etc.)
+            parseAndExpandLinks(data.message, content);
         }
 
         if (data.image) {
@@ -2796,11 +2967,106 @@
             content.appendChild(aud);
         }
 
+        // Reactions Display Container
+        const reactionsContainer = document.createElement("div");
+        reactionsContainer.className = "reactions-container";
+        reactionsContainer.id = "reactions-" + key;
+        content.appendChild(reactionsContainer);
+
+        // Realtime Listener for Message Reactions
+        onValue(ref(database, `messages/${key}/reactions`), (snapshot) => {
+            reactionsContainer.innerHTML = "";
+            const rxns = snapshot.val();
+            if (rxns) {
+                const counts = {};
+                const userReacted = {};
+
+                Object.values(rxns).forEach(r => {
+                    counts[r.emoji] = (counts[r.emoji] || 0) + 1;
+                    if (r.user === username) userReacted[r.emoji] = true;
+                });
+
+                Object.keys(counts).forEach(emoji => {
+                    const badge = document.createElement("div");
+                    badge.className = `reaction-badge ${userReacted[emoji] ? 'active' : ''}`;
+                    badge.innerHTML = `<span>${emoji}</span> <b>${counts[emoji]}</b>`;
+                    badge.onclick = () => toggleReaction(key, emoji);
+                    reactionsContainer.appendChild(badge);
+                });
+            }
+        });
+
         message.appendChild(avatar);
         message.appendChild(content);
 
         messages.appendChild(message);
         messages.scrollTop = messages.scrollHeight;
+    }
+
+    // Toggle Message Reactions
+    async function toggleReaction(msgKey, emoji) {
+        if (!username) return;
+        const safeUserKey = username.replace(/[.#$[\]]/g, "_");
+        const rxnRef = ref(database, `messages/${msgKey}/reactions/${safeUserKey}_${emoji.codePointAt(0)}`);
+        const snap = await get(rxnRef);
+
+        if (snap.exists()) {
+            await remove(rxnRef);
+        } else {
+            await set(rxnRef, {
+                user: username,
+                emoji: emoji
+            });
+        }
+    }
+
+    // Link Parsing & Embed Expansion
+    function parseAndExpandLinks(text, container) {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const matches = text.match(urlRegex);
+        if (!matches) return;
+
+        matches.forEach(url => {
+            // Direct Image Links
+            if (url.match(/\.(jpeg|jpg|gif|png|webp)($|\?)/i)) {
+                const img = document.createElement("img");
+                img.src = url;
+                img.className = "chat-image";
+                container.appendChild(img);
+            }
+            // Spotify Embed Links
+            else if (url.includes("spotify.com")) {
+                let spotifyPath = url.split("spotify.com/")[1];
+                if (spotifyPath) {
+                    const embedUrl = `https://open.spotify.com/embed/${spotifyPath.split('?')[0]}`;
+                    const iframe = document.createElement("iframe");
+                    iframe.src = embedUrl;
+                    iframe.style.cssText = "width:100%; height:80px; border:none; border-radius:12px; margin-top:8px;";
+                    iframe.allow = "encrypted-media";
+                    container.appendChild(iframe);
+                }
+            }
+            // TikTok Embed / Share Link Display
+            else if (url.includes("tiktok.com")) {
+                const embedCard = document.createElement("div");
+                embedCard.className = "embed-card tiktok";
+                embedCard.innerHTML = `
+                    <div class="embed-title">🎵 TikTok Share Link</div>
+                    <div class="embed-desc"><a href="${url}" target="_blank" style="color:#00ffcc;">${url}</a></div>
+                `;
+                container.appendChild(embedCard);
+            }
+            // General Web Links Preview Card
+            else {
+                const embedCard = document.createElement("div");
+                embedCard.className = "embed-card";
+                embedCard.innerHTML = `
+                    <div class="embed-title">🔗 External Link</div>
+                    <div class="embed-desc"><a href="${url}" target="_blank" style="color:#5865f2;">${url}</a></div>
+                `;
+                container.appendChild(embedCard);
+            }
+        });
     }
 </script>
 
