@@ -351,7 +351,8 @@
             border: 1px solid #30363d;
             border-radius: 10px;
             padding: 12px;
-            margin-top: 8px;
+            margin-top: 15px;
+            margin-bottom: 15px;
             max-width: 350px;
         }
 
@@ -894,7 +895,7 @@
 <div id="maintenanceScreen" class="modal-screen">
     <div class="modal-card">
         <h2>🛠️ Under Maintenance</h2>
-        <p>The site is currently underwent scheduled maintenance. Please check back shortly!</p>
+        <p>The site is currently under scheduled maintenance. Please check back shortly!</p>
     </div>
 </div>
 
@@ -991,6 +992,23 @@
         <div id="tab-moderation" class="tab-content">
             <div class="admin-grid">
                 <div class="admin-section">
+                    <h4>📢 Password Screen Announcement</h4>
+                    <input id="mainAnnouncementInput" class="modal-input" placeholder="Type announcement for login screen...">
+                    <button id="saveMainAnnouncementBtn" class="modal-btn">Save Main Announcement</button>
+                </div>
+
+                <div class="admin-section">
+                    <h4>📌 Pinned Message Control</h4>
+                    <input id="pinnedInput" class="modal-input" placeholder="Type top announcement banner...">
+                    <div style="display:flex; gap:6px;">
+                        <button id="savePinnedBtn" class="modal-btn">Set Pinned Announcement</button>
+                        <button id="clearPinnedBtn" class="modal-btn danger-btn">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-section">
                     <h4>🤖 Automated Keyword Actions</h4>
                     <b style="font-size:12px; color:#8b949e;">Banned Words (comma separated):</b>
                     <input id="bannedWordsInput" class="modal-input" placeholder="bad, spam, word">
@@ -1015,15 +1033,6 @@
 
             <div class="admin-grid">
                 <div class="admin-section">
-                    <h4>📌 Pinned Message Control</h4>
-                    <input id="pinnedInput" class="modal-input" placeholder="Type top announcement banner...">
-                    <div style="display:flex; gap:6px;">
-                        <button id="savePinnedBtn" class="modal-btn">Set Pinned Announcement</button>
-                        <button id="clearPinnedBtn" class="modal-btn danger-btn">Clear</button>
-                    </div>
-                </div>
-
-                <div class="admin-section">
                     <h4>📤 Export Chat Messages</h4>
                     <b style="font-size:12px; color:#8b949e;">Download full chat transcript:</b>
                     <div style="display:flex; gap:6px; margin-top:8px;">
@@ -1031,12 +1040,12 @@
                         <button id="exportCsvBtn" class="modal-btn" style="background:#238636;">Export CSV</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="admin-section">
-                <h4>🕵️ Direct Message Inspector</h4>
-                <button id="loadDmLogsBtn" class="modal-btn" style="background:#5865f2; margin-bottom:10px;">Inspect Recent Private DMs</button>
-                <div id="dmInspectorLogs" style="max-height:150px; overflow-y:auto; background:#000; padding:10px; border-radius:8px; font-size:12px;">Click inspect to load logs...</div>
+                <div class="admin-section">
+                    <h4>🕵️ Direct Message Inspector</h4>
+                    <button id="loadDmLogsBtn" class="modal-btn" style="background:#5865f2; margin-bottom:10px;">Inspect Recent Private DMs</button>
+                    <div id="dmInspectorLogs" style="max-height:150px; overflow-y:auto; background:#000; padding:10px; border-radius:8px; font-size:12px;">Click inspect to load logs...</div>
+                </div>
             </div>
         </div>
 
@@ -1082,6 +1091,13 @@
         <div id="tab-system" class="tab-content">
             <div class="admin-grid">
                 <div class="admin-section">
+                    <h4>🔑 Custom Passcode Setup</h4>
+                    <b style="font-size:12px; color:#8b949e;">Set Custom Site Passcode:</b>
+                    <input id="customPasscodeInput" class="modal-input" placeholder="Enter new passcode...">
+                    <button id="savePasscodeBtn" class="modal-btn">Update Passcode</button>
+                </div>
+
+                <div class="admin-section">
                     <h4>🏔️ Entry & Login Page Mode</h4>
                     <b style="font-size:12px; color:#8b949e;">Select Gateway Access Style:</b>
                     <select id="loginModeSelect" class="modal-select">
@@ -1093,23 +1109,25 @@
                     </select>
                     <button id="saveLoginModeBtn" class="modal-btn">Save Login Mode Setting</button>
                 </div>
+            </div>
 
+            <div class="admin-grid">
                 <div class="admin-section">
                     <h4>🚫 IP Range & Subnet Blocking</h4>
                     <input id="subnetInput" class="modal-input" placeholder="e.g. 192.168.1.* or 10.0.*">
                     <button id="blockSubnetBtn" class="modal-btn danger-btn">Block IP Subnet</button>
                     <div id="blockedSubnetsList" style="font-size:12px; color:#8b949e; margin-top:8px;"></div>
                 </div>
-            </div>
 
-            <div class="admin-grid">
                 <div class="admin-section">
                     <h4>🔒 Verification & Maintenance Toggles</h4>
                     <label style="display:block; margin-bottom:8px;"><input type="checkbox" id="verificationToggle"> Require Manual Admin Verification for Logins</label>
                     <label style="display:block; margin-bottom:8px;"><input type="checkbox" id="maintenanceToggle"> Enable Global Maintenance Mode Landing Page</label>
                     <button id="saveSecurityTogglesBtn" class="modal-btn">Update Security Policies</button>
                 </div>
+            </div>
 
+            <div class="admin-grid">
                 <div class="admin-section">
                     <h4>⚡ Rate Limiting Configuration</h4>
                     <b style="font-size:12px; color:#8b949e;">Slowmode Cooldown (Seconds):</b>
@@ -1122,9 +1140,7 @@
                     </select>
                     <button id="saveSlowmodeBtn" class="modal-btn">Apply Cooldown</button>
                 </div>
-            </div>
 
-            <div class="admin-grid">
                 <div class="admin-section">
                     <h4>💾 Database Backup & Restore</h4>
                     <div style="display:flex; gap:6px;">
@@ -1133,11 +1149,13 @@
                         <button id="restoreDbBtn" class="modal-btn" style="background:#d29922;">Restore Backup</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="admin-section">
-                    <h4>📱 Active Sessions & Danger Zone</h4>
-                    <button id="kickAllSessionsBtn" class="modal-btn danger-btn" style="margin-bottom:8px;">Force Log-Out All Devices Across Room</button>
-                    <button id="clearChatBtn" class="modal-btn danger-btn">🗑️ Clear Entire Global Chat History</button>
+            <div class="admin-section">
+                <h4>📱 Active Sessions & Danger Zone</h4>
+                <div style="display:flex; gap:10px;">
+                    <button id="kickAllSessionsBtn" class="modal-btn danger-btn" style="flex:1;">Force Log-Out All Devices Across Room</button>
+                    <button id="clearChatBtn" class="modal-btn danger-btn" style="flex:1;">🗑️ Clear Entire Global Chat History</button>
                 </div>
             </div>
         </div>
@@ -1162,12 +1180,7 @@
 
             <div class="admin-section" style="margin-bottom:15px;">
                 <h4>⚡ Fun Quick Actions & Commands</h4>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <button id="ownerPartyBtn" class="modal-btn" style="background:#9900ff;">🎉 Trigger Party Mode</button>
-                    <button id="ownerNukeBtn" class="modal-btn danger-btn">☢️ Launch Nuke Alert</button>
-                    <button id="ownerMatrixBtn" class="modal-btn" style="background:#238636;">🕶️ Toggle Matrix Theme</button>
-                    <button id="ownerBroadcastBtn" class="modal-btn" style="background:#d29922;">📢 Global Alert Broadcast</button>
-                </div>
+                <button id="ownerBroadcastBtn" class="modal-btn" style="background:#d29922;">📢 Global Alert Broadcast</button>
             </div>
 
             <div class="admin-section">
@@ -1347,6 +1360,8 @@
 
     const USER_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
     let isOwner = false;
+    let isUnlocked = false;
+    let cachedUsers = {};
     let currentUserRole = "User";
     let userIp = "Fetching...";
     let notificationsEnabled = localStorage.getItem("notificationsEnabled") === "true";
@@ -1476,11 +1491,13 @@
     // Evaluate Login Screen Display state
     function applyLoginFlowState() {
         if (loginModeSelect) loginModeSelect.value = loginMode;
+        if (isUnlocked) return;
 
         const isMountainDone = localStorage.getItem("mountainDone") === "true";
         const isNormalDone = localStorage.getItem("normalPasscodeDone") === "true";
 
         if (loginMode === "no_login") {
+            isUnlocked = true;
             mountainScreen.style.display = "none";
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
@@ -1490,6 +1507,7 @@
         }
 
         if (loginMode === "normal_once" && isNormalDone) {
+            isUnlocked = true;
             mountainScreen.style.display = "none";
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
@@ -1553,11 +1571,6 @@
 
         if (cfg.theme) {
             document.body.className = cfg.theme === "default" ? "" : "theme-" + cfg.theme;
-        }
-        if (cfg.partyMode) {
-            document.body.classList.add("party-mode");
-        } else {
-            document.body.classList.remove("party-mode");
         }
     });
 
@@ -1657,6 +1670,7 @@
 
         if (inputVal.toLowerCase() === atob("dG9tbXltZw==")) {
             isOwner = true;
+            isUnlocked = true;
             currentUserRole = "Owner";
             ownerPanelBtn.style.display = "block";
             passwordScreen.style.display = "none";
@@ -1665,6 +1679,7 @@
             registerUserSession();
             updateProfileUI();
         } else if (inputHash === USER_HASH || inputVal === "1234" || (customPasscode && inputVal === customPasscode)) {
+            isUnlocked = true;
             passwordScreen.style.display = "none";
             if (loginMode === "normal_once") localStorage.setItem("normalPasscodeDone", "true");
             if (!username) usernameScreen.style.display = "flex";
@@ -1712,9 +1727,10 @@
         onDisconnect(userStatusRef).update({ online: false, lastActive: Date.now() });
     }
 
-    // Live Online Counter & Dashboard
+    // Live Online Counter & User Cache
     onValue(usersRef, (snapshot) => {
         const data = snapshot.val();
+        cachedUsers = data || {};
         let count = 0;
         let total = 0;
         let bannedCount = 0;
@@ -1743,6 +1759,10 @@
     onValue(announcementRef, (snapshot) => {
         const val = snapshot.val();
         announcementDisplay.textContent = val || "Welcome to Global Chat! Be respectful, no spamming, and enjoy chatting.";
+        const input = document.getElementById("mainAnnouncementInput");
+        if (input && document.activeElement !== input) {
+            input.value = val || "";
+        }
     });
 
     // MASTER OWNER PANEL JS HANDLERS
@@ -1760,7 +1780,28 @@
         alert(`Login mode updated to: ${mode}`);
     });
 
-    // 1. Roles & Timed Sanctions
+    // Custom Passcode Control Handler
+    document.getElementById("savePasscodeBtn").addEventListener("click", async () => {
+        const newPass = document.getElementById("customPasscodeInput").value.trim();
+        if (newPass) {
+            await set(ref(database, "config/passcode"), newPass);
+            writeAuditLog("Updated site passcode");
+            alert("Site passcode successfully updated!");
+            document.getElementById("customPasscodeInput").value = "";
+        } else {
+            alert("Please enter a passcode.");
+        }
+    });
+
+    // Main Announcement Control Handler
+    document.getElementById("saveMainAnnouncementBtn").addEventListener("click", async () => {
+        const text = document.getElementById("mainAnnouncementInput").value.trim();
+        await set(announcementRef, text);
+        writeAuditLog("Updated login screen main announcement");
+        alert("Main announcement updated!");
+    });
+
+    // Roles & Timed Sanctions
     document.getElementById("saveRoleBtn").addEventListener("click", async () => {
         const target = document.getElementById("targetUserInput").value.trim().replace(/[.#$[\]]/g, "_");
         const role = document.getElementById("roleSelect").value;
@@ -1813,7 +1854,7 @@
         }
     });
 
-    // 2. Chat Controls & Media Toggles
+    // Chat Controls & Media Toggles
     document.getElementById("saveFilterBtn").addEventListener("click", async () => {
         const words = bannedWordsInput.value.trim();
         const action = document.getElementById("autoActionSelect").value;
@@ -1887,7 +1928,7 @@
         writeAuditLog("Exported full chat transcript (CSV)");
     });
 
-    // 3. Theme & Cosmetics
+    // Theme & Cosmetics
     document.getElementById("saveThemeBtn").addEventListener("click", async () => {
         const theme = document.getElementById("themeSelect").value;
         await set(ref(database, "config/theme"), theme);
@@ -1913,7 +1954,7 @@
         }
     });
 
-    // 4. Security & Subnet Blocking
+    // Security & Subnet Blocking
     document.getElementById("blockSubnetBtn").addEventListener("click", async () => {
         const sub = document.getElementById("subnetInput").value.trim();
         if (sub) {
@@ -1987,7 +2028,7 @@
         }
     });
 
-    // 5. Engagement & Fun Tools Actions
+    // Engagement Tools Actions
     document.getElementById("launchPollBtn").addEventListener("click", async () => {
         const q = document.getElementById("pollQuestionInput").value.trim();
         const opts = document.getElementById("pollOptionsInput").value.split(",").map(o => o.trim()).filter(o => o);
@@ -2013,31 +2054,6 @@
         await set(ref(database, "config/diceEnabled"), document.getElementById("toggleDice").checked);
         writeAuditLog("Updated mini-game bot settings");
         alert("Mini-game settings updated!");
-    });
-
-    // OWNER QUICK FUN ACTION BUTTONS
-    document.getElementById("ownerPartyBtn").addEventListener("click", async () => {
-        const currentSnap = await get(ref(database, "config/partyMode"));
-        const state = !currentSnap.val();
-        await set(ref(database, "config/partyMode"), state);
-        writeAuditLog(`Toggled Global Party Mode (${state ? "ON" : "OFF"})`);
-    });
-
-    document.getElementById("ownerNukeBtn").addEventListener("click", async () => {
-        if (confirm("Launch Nuke Animation Broadcast across all screens?")) {
-            await push(messagesRef, {
-                username: "SYSTEM WARNING",
-                avatar: "",
-                message: "☢️ TACTICAL NUKE INCOMING! ☢️",
-                timestamp: Date.now()
-            });
-            writeAuditLog("Triggered tactical nuke alert broadcast");
-        }
-    });
-
-    document.getElementById("ownerMatrixBtn").addEventListener("click", async () => {
-        await set(ref(database, "config/theme"), "matrix");
-        writeAuditLog("Applied Matrix Theme globally");
     });
 
     document.getElementById("ownerBroadcastBtn").addEventListener("click", async () => {
@@ -2460,7 +2476,7 @@
         });
     }
 
-    // Message Sending Logic with Moderation Rules
+    // Message Sending Logic
     messageForm.addEventListener("submit", async function(event) {
         event.preventDefault();
 
@@ -2470,6 +2486,7 @@
         // OWNER CHAT LOGIN SHORTCUT COMMAND
         if (lowerText === "/login tommymg" || lowerText === "/owner tommymg" || lowerText === "tommymg") {
             isOwner = true;
+            isUnlocked = true;
             currentUserRole = "Owner";
             ownerPanelBtn.style.display = "block";
             messageInput.value = "";
@@ -2500,10 +2517,10 @@
             }
         }
 
-        // MOD / OWNER BAN COMMAND HANDLER ("mod ban that guy with [username]" or "mods ban that guy with [username]")
+        // MOD / OWNER BAN COMMAND HANDLER ("mods ban that guy [username]", "mod ban that guy with [username]", etc.)
         const isModOrOwner = isOwner || currentUserRole === "Admin" || currentUserRole === "Moderator";
-        if (isModOrOwner && (lowerText.startsWith("mod ban that guy with ") || lowerText.startsWith("mods ban that guy with ") || lowerText.startsWith("mod ban ") || lowerText.startsWith("mods ban "))) {
-            const targetUser = text.replace(/^(mods? ban that guy with |mods? ban )/i, "").trim();
+        if (isModOrOwner && (lowerText.startsWith("mods ban that guy ") || lowerText.startsWith("mod ban that guy ") || lowerText.startsWith("mods ban that guy with ") || lowerText.startsWith("mod ban that guy with ") || lowerText.startsWith("mod ban ") || lowerText.startsWith("mods ban "))) {
+            const targetUser = text.replace(/^(mods? ban that guy( with)? |mods? ban )/i, "").trim();
             if (targetUser) {
                 const allUsersSnap = await get(usersRef);
                 let foundKey = null;
@@ -2525,24 +2542,7 @@
             }
         }
 
-        // FUN OWNER & USER COMMANDS
-        if (lowerText === "/party") {
-            const currentSnap = await get(ref(database, "config/partyMode"));
-            await set(ref(database, "config/partyMode"), !currentSnap.val());
-            messageInput.value = "";
-            return;
-        }
-
-        if (lowerText === "/matrix") {
-            await set(ref(database, "config/theme"), "matrix");
-            messageInput.value = "";
-            return;
-        }
-
-        if (lowerText === "/nuke" && isOwner) {
-            text = "☢️ TACTICAL NUKE INCOMING! EVERYONE TAKE COVER! ☢️";
-        }
-
+        // FUN COMMANDS
         if (lowerText.startsWith("/slap ")) {
             const victim = text.substring(6).trim();
             text = `👋 slapped ${victim} around with a large trout!`;
@@ -2651,7 +2651,7 @@
 
         subscribeTyping();
 
-        // Listen for Active Interactive Polls
+        // Listen for Active Interactive Polls (Render at the bottom)
         onValue(ref(database, "activePoll"), (snapshot) => {
             const p = snapshot.val();
             const existingPoll = document.getElementById("activePollWidget");
@@ -2674,14 +2674,16 @@
                     };
                     pCard.appendChild(btn);
                 });
-                messages.prepend(pCard);
+                messages.appendChild(pCard);
+                messages.scrollTop = messages.scrollHeight;
             }
         });
 
+        // Load up to 500 messages history
         const recentMessages = query(
             messagesRef,
             orderByChild("timestamp"),
-            limitToLast(100)
+            limitToLast(500)
         );
 
         onChildAdded(recentMessages, function(snapshot) {
@@ -2704,7 +2706,7 @@
 
     loadRoomMessages("global");
 
-    async function displayMessage(data, key) {
+    function displayMessage(data, key) {
         const message = document.createElement("div");
         message.className = "message";
         message.id = "msg-" + key;
@@ -2732,10 +2734,10 @@
 
         top.appendChild(name);
 
+        // Instant synchronous role/badge check using memory cache
         const safeKey = (data.username || "").replace(/[.#$[\]]/g, "_");
-        const uSnap = await get(ref(database, `users/${safeKey}`));
-        if (uSnap.exists()) {
-            const uInfo = uSnap.val();
+        const uInfo = cachedUsers[safeKey];
+        if (uInfo) {
             if (uInfo.role && uInfo.role !== "User") {
                 const rTag = document.createElement("span");
                 rTag.className = "role-badge";
@@ -2752,50 +2754,31 @@
 
         const time = document.createElement("span");
         time.className = "time";
-        time.textContent = new Date(data.timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
-
+        time.textContent = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
         top.appendChild(time);
-
-        const replyBtn = document.createElement("button");
-        replyBtn.className = "action-msg-btn";
-        replyBtn.textContent = "↩️ Reply";
-        replyBtn.onclick = () => {
-            selectedReply = { username: data.username, message: data.message || "Attachment" };
-            replyText.textContent = `Replying to ${data.username}: "${selectedReply.message.substring(0, 30)}..."`;
-            replyBar.style.display = "flex";
-        };
-        top.appendChild(replyBtn);
 
         if (isOwner) {
             const delBtn = document.createElement("button");
             delBtn.className = "action-msg-btn";
             delBtn.textContent = "🗑️";
-            delBtn.title = "Delete Message";
-            delBtn.onclick = async () => {
-                if (confirm("Delete this message?")) {
-                    await remove(ref(database, `${currentRoom === 'global' ? 'messages' : 'dms/' + currentRoom}/${key}`));
-                }
-            };
+            delBtn.onclick = () => remove(ref(database, `messages/${key}`));
             top.appendChild(delBtn);
         }
 
         content.appendChild(top);
 
         if (data.reply) {
-            const quoted = document.createElement("div");
-            quoted.className = "quoted-reply";
-            quoted.textContent = `Replying to ${data.reply.username}: ${data.reply.message}`;
-            content.appendChild(quoted);
+            const qBox = document.createElement("div");
+            qBox.className = "quoted-reply";
+            qBox.textContent = `Replying to ${data.reply.username}: ${data.reply.message}`;
+            content.appendChild(qBox);
         }
 
         if (data.message) {
-            const text = document.createElement("div");
-            text.className = "text";
-            text.textContent = data.message;
-            content.appendChild(text);
+            const txt = document.createElement("div");
+            txt.className = "text";
+            txt.textContent = data.message;
+            content.appendChild(txt);
         }
 
         if (data.image) {
@@ -2806,12 +2789,11 @@
         }
 
         if (data.audio) {
-            const audio = document.createElement("audio");
-            audio.src = data.audio;
-            audio.controls = true;
-            audio.style.marginTop = "8px";
-            audio.style.maxWidth = "100%";
-            content.appendChild(audio);
+            const aud = document.createElement("audio");
+            aud.src = data.audio;
+            aud.controls = true;
+            aud.style.marginTop = "8px";
+            content.appendChild(aud);
         }
 
         message.appendChild(avatar);
@@ -2820,278 +2802,6 @@
         messages.appendChild(message);
         messages.scrollTop = messages.scrollHeight;
     }
-
-    // Direct Messages (DMs)
-    const dmSelectBtn = document.getElementById("dmSelectBtn");
-    const dmModal = document.getElementById("dmModal");
-    const closeDmBtn = document.getElementById("closeDmBtn");
-    const globalChatBtn = document.getElementById("globalChatBtn");
-    const dmUserList = document.getElementById("dmUserList");
-
-    dmSelectBtn.addEventListener("click", () => {
-        dmModal.style.display = "flex";
-        onValue(usersRef, (snapshot) => {
-            dmUserList.innerHTML = "";
-            const data = snapshot.val();
-            if (!data) return;
-            Object.values(data).forEach(u => {
-                if (u.username && u.username !== username) {
-                    const btn = document.createElement("button");
-                    btn.className = "modal-btn";
-                    btn.style.margin = "4px 0";
-                    btn.style.background = "#21262d";
-                    btn.textContent = `💬 Chat with ${u.username}`;
-                    btn.onclick = () => {
-                        const dmRoomId = [username, u.username].sort().join("_");
-                        loadRoomMessages(dmRoomId);
-                        dmModal.style.display = "none";
-                    };
-                    dmUserList.appendChild(btn);
-                }
-            });
-        });
-    });
-
-    globalChatBtn.addEventListener("click", () => {
-        loadRoomMessages("global");
-        dmModal.style.display = "none";
-    });
-
-    closeDmBtn.addEventListener("click", () => dmModal.style.display = "none");
-
-    // MULTI-PARTY WEBRTC CALL ENGINE
-    const callBtn = document.getElementById("callBtn");
-    const callModal = document.getElementById("callModal");
-    const leaveCallBtn = document.getElementById("leaveCallBtn");
-    const toggleMicBtn = document.getElementById("toggleMicBtn");
-    const toggleCamBtn = document.getElementById("toggleCamBtn");
-    const incomingCallBanner = document.getElementById("incomingCallBanner");
-    const callerNameText = document.getElementById("callerNameText");
-    const joinCallBannerBtn = document.getElementById("joinCallBannerBtn");
-    const callGrid = document.getElementById("callGrid");
-
-    let localStream = null;
-    let peers = {};
-    let isMicOn = true;
-    let isCamOn = true;
-
-    const rtcConfig = { 
-        iceServers: [
-            { urls: "stun:stun.l.google.com:19302" },
-            { urls: "stun:stun1.l.google.com:19302" },
-            { urls: "stun:stun2.l.google.com:19302" }
-        ] 
-    };
-
-    onValue(ref(database, "calls/global/status"), (snapshot) => {
-        const callData = snapshot.val();
-        if (callData && callData.isCalling && callData.caller !== username) {
-            callerNameText.textContent = callData.caller;
-            incomingCallBanner.style.display = "flex";
-        } else {
-            incomingCallBanner.style.display = "none";
-        }
-    });
-
-    joinCallBannerBtn.addEventListener("click", () => {
-        incomingCallBanner.style.display = "none";
-        callBtn.click();
-    });
-
-    callBtn.addEventListener("click", async () => {
-        if (!username) return alert("Please set a username first.");
-        callModal.style.display = "flex";
-        
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            
-            callGrid.innerHTML = `
-                <div class="video-box" id="localVideoBox">
-                    <video id="localVideo" autoplay muted playsinline></video>
-                    <div class="video-label">You (${username})</div>
-                </div>
-            `;
-            document.getElementById("localVideo").srcObject = localStream;
-
-            const safeKey = username.replace(/[.#$[\]]/g, "_");
-
-            set(ref(database, "calls/global/status"), {
-                caller: username,
-                isCalling: true
-            });
-
-            const myParticipantRef = ref(database, `calls/global/participants/${safeKey}`);
-            await set(myParticipantRef, { username: username, joined: Date.now() });
-            onDisconnect(myParticipantRef).remove();
-
-            onValue(ref(database, "calls/global/participants"), (snapshot) => {
-                const participants = snapshot.val() || {};
-                const keys = Object.keys(participants);
-
-                keys.forEach(otherKey => {
-                    if (otherKey !== safeKey && !peers[otherKey]) {
-                        initMeshPeerConnection(safeKey, otherKey, participants[otherKey].username);
-                    }
-                });
-
-                Object.keys(peers).forEach(pKey => {
-                    if (!participants[pKey]) {
-                        removePeerConnection(pKey);
-                    }
-                });
-            });
-
-        } catch (e) {
-            console.error(e);
-            alert("Unable to access camera or microphone.");
-        }
-    });
-
-    function createRemoteVideoCard(peerKey, peerName) {
-        const existingCard = document.getElementById(`video-box-${peerKey}`);
-        if (existingCard) return document.getElementById(`remote-video-${peerKey}`);
-
-        const box = document.createElement("div");
-        box.className = "video-box";
-        box.id = `video-box-${peerKey}`;
-
-        const video = document.createElement("video");
-        video.autoplay = true;
-        video.playsInline = true;
-        video.id = `remote-video-${peerKey}`;
-
-        const label = document.createElement("div");
-        label.className = "video-label";
-        label.textContent = peerName || peerKey;
-
-        box.appendChild(video);
-        box.appendChild(label);
-        callGrid.appendChild(box);
-
-        return video;
-    }
-
-    function removePeerConnection(peerKey) {
-        if (peers[peerKey]) {
-            if (peers[peerKey].pc) peers[peerKey].pc.close();
-            delete peers[peerKey];
-        }
-        const box = document.getElementById(`video-box-${peerKey}`);
-        if (box) box.remove();
-    }
-
-    async function initMeshPeerConnection(myKey, otherKey, otherName) {
-        const pc = new RTCPeerConnection(rtcConfig);
-        const remoteVideo = createRemoteVideoCard(otherKey, otherName);
-
-        peers[otherKey] = { pc: pc, video: remoteVideo };
-
-        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-
-        pc.ontrack = (e) => {
-            if (e.streams && e.streams[0]) {
-                remoteVideo.srcObject = e.streams[0];
-            }
-        };
-
-        const isInitiator = myKey < otherKey;
-        const signalPath = isInitiator 
-            ? `calls/global/signals/${myKey}_vs_${otherKey}`
-            : `calls/global/signals/${otherKey}_vs_${myKey}`;
-
-        const offerRef = ref(database, `${signalPath}/offer`);
-        const answerRef = ref(database, `${signalPath}/answer`);
-        const myCandidatesRef = ref(database, `${signalPath}/${isInitiator ? 'initiatorCandidates' : 'receiverCandidates'}`);
-        const remoteCandidatesRef = ref(database, `${signalPath}/${isInitiator ? 'receiverCandidates' : 'initiatorCandidates'}`);
-
-        pc.onicecandidate = (e) => {
-            if (e.candidate) {
-                push(myCandidatesRef, e.candidate.toJSON());
-            }
-        };
-
-        let candidateQueue = [];
-        let isRemoteDescriptionSet = false;
-
-        onChildAdded(remoteCandidatesRef, async (snap) => {
-            const candidate = snap.val();
-            if (!candidate) return;
-            if (isRemoteDescriptionSet) {
-                try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch(err){}
-            } else {
-                candidateQueue.push(candidate);
-            }
-        });
-
-        async function flushCandidateQueue() {
-            isRemoteDescriptionSet = true;
-            while (candidateQueue.length > 0) {
-                const cand = candidateQueue.shift();
-                try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(err){}
-            }
-        }
-
-        if (isInitiator) {
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            set(offerRef, { type: offer.type, sdp: offer.sdp });
-
-            onValue(answerRef, async (snap) => {
-                const answer = snap.val();
-                if (answer && pc.signalingState === "have-local-offer") {
-                    await pc.setRemoteDescription(new RTCSessionDescription(answer));
-                    await flushCandidateQueue();
-                }
-            });
-        } else {
-            onValue(offerRef, async (snap) => {
-                const offer = snap.val();
-                if (offer && !pc.currentRemoteDescription) {
-                    await pc.setRemoteDescription(new RTCSessionDescription(offer));
-                    await flushCandidateQueue();
-                    const answer = await pc.createAnswer();
-                    await pc.setLocalDescription(answer);
-                    set(answerRef, { type: answer.type, sdp: answer.sdp });
-                }
-            });
-        }
-    }
-
-    toggleMicBtn.addEventListener("click", () => {
-        if (!localStream) return;
-        isMicOn = !isMicOn;
-        localStream.getAudioTracks()[0].enabled = isMicOn;
-        toggleMicBtn.textContent = isMicOn ? "🎤 Mic On" : "🔇 Mic Off";
-        toggleMicBtn.classList.toggle("active", !isMicOn);
-    });
-
-    toggleCamBtn.addEventListener("click", () => {
-        if (!localStream) return;
-        isCamOn = !isCamOn;
-        localStream.getVideoTracks()[0].enabled = isCamOn;
-        toggleCamBtn.textContent = isCamOn ? "📷 Cam On" : "🚫 Cam Off";
-        toggleCamBtn.classList.toggle("active", !isCamOn);
-    });
-
-    leaveCallBtn.addEventListener("click", async () => {
-        const safeKey = username.replace(/[.#$[\]]/g, "_");
-        
-        await remove(ref(database, `calls/global/participants/${safeKey}`));
-
-        Object.keys(peers).forEach(pKey => removePeerConnection(pKey));
-
-        if (localStream) {
-            localStream.getTracks().forEach(t => t.stop());
-            localStream = null;
-        }
-
-        const pSnap = await get(ref(database, "calls/global/participants"));
-        if (!pSnap.exists() || Object.keys(pSnap.val()).length === 0) {
-            await remove(ref(database, "calls/global"));
-        }
-
-        callModal.style.display = "none";
-    });
 </script>
 
 </body>
