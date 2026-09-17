@@ -174,6 +174,7 @@
             text-overflow: ellipsis;
         }
 
+        /* Banner & Call Styles */
         .call-banner, .pinned-banner, .event-banner {
             background: #5865f2;
             color: white;
@@ -442,6 +443,33 @@
             z-index: 100;
         }
 
+        #mountainScreen {
+            z-index: 150;
+            background-image: url('image_390926.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: pointer;
+            user-select: none;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        .mountain-hint {
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
         #passwordScreen { z-index: 101; }
         #ownerModal { z-index: 102; }
         #maintenanceScreen { z-index: 200; display: none; }
@@ -633,7 +661,6 @@
         .ban-btn { background: #da3633; }
         .unban-btn { background: #238636; }
         .mute-btn { background: #d29922; }
-        .unmute-btn { background: #238636; }
         .purge-btn { background: #8b949e; }
 
         .audit-log-box {
@@ -791,6 +818,11 @@
 
 </div>
 
+<!-- MOUNTAIN SCREEN OVERLAY -->
+<div id="mountainScreen" class="modal-screen">
+    <div id="mountainHint" class="mountain-hint">Click the mountain 5 times to enter (5)</div>
+</div>
+
 <!-- CALL MODAL -->
 <div id="callModal" class="modal-screen" style="display:none;">
     <div class="modal-card" style="max-width: 750px;">
@@ -824,7 +856,7 @@
 <div id="maintenanceScreen" class="modal-screen">
     <div class="modal-card">
         <h2>🛠️ Under Maintenance</h2>
-        <p>The site is currently undergoing scheduled maintenance. Please check back shortly!</p>
+        <p>The site is currently underwent scheduled maintenance. Please check back shortly!</p>
     </div>
 </div>
 
@@ -877,14 +909,14 @@
                 </div>
 
                 <div class="admin-section">
-                    <h4>⏱️ Timed Sanctions & Actions</h4>
+                    <h4>⏱️ Timed Sanctions & Force Rename</h4>
                     <b style="font-size:12px; color:#8b949e;">Timed Sanction Duration:</b>
                     <select id="sanctionTimeSelect" class="modal-select">
                         <option value="600">10 Minutes</option>
                         <option value="3600">1 Hour</option>
                         <option value="86400">24 Hours</option>
                     </select>
-                    <div style="display:flex; gap:6px; margin-bottom:8px;">
+                    <div style="display:flex; gap:6px;">
                         <button id="timedBanBtn" class="modal-btn danger-btn">Timed Ban</button>
                         <button id="timedMuteBtn" class="modal-btn" style="background:#d29922;">Timed Mute</button>
                     </div>
@@ -1012,25 +1044,34 @@
         <div id="tab-system" class="tab-content">
             <div class="admin-grid">
                 <div class="admin-section">
-                    <h4>🔑 Initial Passcode Settings</h4>
-                    <b style="font-size:12px; color:#8b949e;">Login Requirement Mode:</b>
+                    <h4>🏔️ Entry & Login Page Mode</h4>
+                    <b style="font-size:12px; color:#8b949e;">Select Gateway Access Style:</b>
                     <select id="loginModeSelect" class="modal-select">
-                        <option value="everytime">Login Every Time (Standard)</option>
-                        <option value="once">One-Time Login (Remember Device)</option>
-                        <option value="disabled">No Login Needed (Bypass Passcode)</option>
+                        <option value="normal_always">Normal Login (Always)</option>
+                        <option value="normal_once">Normal Login (One Time)</option>
+                        <option value="mountain_always">Mountain then Login (Always)</option>
+                        <option value="mountain_once">Mountain then Login (One Time)</option>
+                        <option value="no_login">No Login</option>
                     </select>
-                    <button id="saveLoginModeBtn" class="modal-btn">Save Passcode Mode</button>
+                    <button id="saveLoginModeBtn" class="modal-btn">Save Login Mode Setting</button>
                 </div>
 
+                <div class="admin-section">
+                    <h4>🚫 IP Range & Subnet Blocking</h4>
+                    <input id="subnetInput" class="modal-input" placeholder="e.g. 192.168.1.* or 10.0.*">
+                    <button id="blockSubnetBtn" class="modal-btn danger-btn">Block IP Subnet</button>
+                    <div id="blockedSubnetsList" style="font-size:12px; color:#8b949e; margin-top:8px;"></div>
+                </div>
+            </div>
+
+            <div class="admin-grid">
                 <div class="admin-section">
                     <h4>🔒 Verification & Maintenance Toggles</h4>
                     <label style="display:block; margin-bottom:8px;"><input type="checkbox" id="verificationToggle"> Require Manual Admin Verification for Logins</label>
                     <label style="display:block; margin-bottom:8px;"><input type="checkbox" id="maintenanceToggle"> Enable Global Maintenance Mode Landing Page</label>
                     <button id="saveSecurityTogglesBtn" class="modal-btn">Update Security Policies</button>
                 </div>
-            </div>
 
-            <div class="admin-grid">
                 <div class="admin-section">
                     <h4>⚡ Rate Limiting Configuration</h4>
                     <b style="font-size:12px; color:#8b949e;">Slowmode Cooldown (Seconds):</b>
@@ -1042,13 +1083,6 @@
                         <option value="30">30 Seconds</option>
                     </select>
                     <button id="saveSlowmodeBtn" class="modal-btn">Apply Cooldown</button>
-                </div>
-
-                <div class="admin-section">
-                    <h4>🚫 IP Range & Subnet Blocking</h4>
-                    <input id="subnetInput" class="modal-input" placeholder="e.g. 192.168.1.* or 10.0.*">
-                    <button id="blockSubnetBtn" class="modal-btn danger-btn">Block IP Subnet</button>
-                    <div id="blockedSubnetsList" style="font-size:12px; color:#8b949e; margin-top:8px;"></div>
                 </div>
             </div>
 
@@ -1267,7 +1301,6 @@
     let userIp = "Fetching...";
     let notificationsEnabled = localStorage.getItem("notificationsEnabled") === "true";
     let customPasscode = null;
-    let loginMode = "everytime"; // options: "everytime", "once", "disabled"
     let isChatLocked = false;
     let slowmodeDelay = 0;
     let bannedWords = [];
@@ -1280,6 +1313,10 @@
     let maintenanceMode = false;
     let requireVerification = false;
     let diceEnabled = true;
+
+    // Login mode states: "normal_always", "normal_once", "mountain_always", "mountain_once", "no_login"
+    let loginMode = "normal_always";
+    let mountainClicksLeft = 5;
 
     fetch("https://api.ipify.org?format=json")
         .then(res => res.json())
@@ -1303,6 +1340,9 @@
 
         return `${os} (${browser})`;
     }
+
+    const mountainScreen = document.getElementById("mountainScreen");
+    const mountainHint = document.getElementById("mountainHint");
 
     const passwordScreen = document.getElementById("passwordScreen");
     const passwordInput = document.getElementById("passwordInput");
@@ -1342,9 +1382,10 @@
     const userTableBody = document.getElementById("userTableBody");
 
     const slowmodeSelect = document.getElementById("slowmodeSelect");
-    const loginModeSelect = document.getElementById("loginModeSelect");
     const bannedWordsInput = document.getElementById("bannedWordsInput");
     const saveFilterBtn = document.getElementById("saveFilterBtn");
+    const loginModeSelect = document.getElementById("loginModeSelect");
+    const saveLoginModeBtn = document.getElementById("saveLoginModeBtn");
 
     const notificationToggle = document.getElementById("notificationToggle");
     notificationToggle.checked = notificationsEnabled;
@@ -1374,11 +1415,67 @@
         });
     }
 
+    // Evaluate Login Screen Display state
+    function applyLoginFlowState() {
+        if (loginModeSelect) loginModeSelect.value = loginMode;
+
+        const isMountainDone = localStorage.getItem("mountainDone") === "true";
+        const isNormalDone = localStorage.getItem("normalPasscodeDone") === "true";
+
+        if (loginMode === "no_login") {
+            mountainScreen.style.display = "none";
+            passwordScreen.style.display = "none";
+            if (!username) usernameScreen.style.display = "flex";
+            registerUserSession();
+            updateProfileUI();
+            return;
+        }
+
+        if (loginMode === "normal_once" && isNormalDone) {
+            mountainScreen.style.display = "none";
+            passwordScreen.style.display = "none";
+            if (!username) usernameScreen.style.display = "flex";
+            registerUserSession();
+            updateProfileUI();
+            return;
+        }
+
+        if (loginMode === "mountain_once" && isMountainDone) {
+            mountainScreen.style.display = "none";
+            // Proceeds directly to standard password screen
+            passwordScreen.style.display = "flex";
+            return;
+        }
+
+        if (loginMode === "mountain_always" || loginMode === "mountain_once") {
+            mountainClicksLeft = 5;
+            mountainHint.textContent = `Click the mountain 5 times to enter (${mountainClicksLeft})`;
+            mountainScreen.style.display = "flex";
+            passwordScreen.style.display = "none";
+        } else {
+            mountainScreen.style.display = "none";
+            passwordScreen.style.display = "flex";
+        }
+    }
+
+    // Mountain spam click logic (5 clicks)
+    mountainScreen.addEventListener("click", () => {
+        mountainClicksLeft--;
+        if (mountainClicksLeft > 0) {
+            mountainHint.textContent = `Click the mountain ${mountainClicksLeft} more time${mountainClicksLeft > 1 ? 's' : ''} (${mountainClicksLeft})`;
+        } else {
+            if (loginMode === "mountain_once") {
+                localStorage.setItem("mountainDone", "true");
+            }
+            mountainScreen.style.display = "none";
+            passwordScreen.style.display = "flex";
+        }
+    });
+
     // Listen to Firebase Room Config
     onValue(configRef, (snapshot) => {
         const cfg = snapshot.val() || {};
         customPasscode = cfg.passcode || null;
-        loginMode = cfg.loginMode || "everytime";
         isChatLocked = cfg.locked || false;
         slowmodeDelay = parseInt(cfg.slowmode || 0);
         bannedWords = cfg.bannedWords ? cfg.bannedWords.split(",").map(w => w.trim().toLowerCase()) : [];
@@ -1388,19 +1485,12 @@
         maintenanceMode = cfg.maintenanceMode || false;
         requireVerification = cfg.requireVerification || false;
         diceEnabled = cfg.diceEnabled !== false;
+        loginMode = cfg.loginMode || "normal_always";
+
+        applyLoginFlowState();
 
         if (slowmodeSelect) slowmodeSelect.value = slowmodeDelay;
-        if (loginModeSelect) loginModeSelect.value = loginMode;
         if (bannedWordsInput) bannedWordsInput.value = cfg.bannedWords || "";
-
-        // Login Mode bypass checks
-        if (loginMode === "disabled") {
-            passwordScreen.style.display = "none";
-            if (!username) usernameScreen.style.display = "flex";
-        } else if (loginMode === "once" && localStorage.getItem("passcodeUnlocked") === "true") {
-            passwordScreen.style.display = "none";
-            if (!username) usernameScreen.style.display = "flex";
-        }
 
         // Maintenance Mode handling
         if (maintenanceMode && !isOwner) {
@@ -1466,6 +1556,7 @@
         const subList = Object.keys(subnets).join(", ");
         document.getElementById("blockedSubnetsList").textContent = "Blocked Subnets: " + (subList || "None");
         
+        // Check if current user IP is blocked
         if (!isOwner && userIp !== "Fetching...") {
             Object.keys(subnets).forEach(sub => {
                 const prefix = sub.replace("*", "");
@@ -1513,14 +1604,13 @@
             isOwner = true;
             ownerPanelBtn.style.display = "block";
             passwordScreen.style.display = "none";
+            if (loginMode === "normal_once") localStorage.setItem("normalPasscodeDone", "true");
             if (!username) usernameScreen.style.display = "flex";
             registerUserSession();
             updateProfileUI();
         } else if (inputHash === USER_HASH || inputVal === "1234" || (customPasscode && inputVal === customPasscode)) {
-            if (loginMode === "once") {
-                localStorage.setItem("passcodeUnlocked", "true");
-            }
             passwordScreen.style.display = "none";
+            if (loginMode === "normal_once") localStorage.setItem("normalPasscodeDone", "true");
             if (!username) usernameScreen.style.display = "flex";
             registerUserSession();
             updateProfileUI();
@@ -1577,8 +1667,8 @@
             total = entries.length;
             entries.forEach(u => {
                 if (u.online) count++;
-                if (u.banned || (u.tempBanUntil && u.tempBanUntil > Date.now())) bannedCount++;
-                if (u.muted || (u.tempMuteUntil && u.tempMuteUntil > Date.now())) mutedCount++;
+                if (u.banned) bannedCount++;
+                if (u.muted) mutedCount++;
             });
         }
 
@@ -1604,6 +1694,14 @@
     });
 
     document.getElementById("closeOwnerBtn").addEventListener("click", () => { ownerModal.style.display = "none"; });
+
+    // Save Login Gateway Mode Option
+    saveLoginModeBtn.addEventListener("click", async () => {
+        const mode = loginModeSelect.value;
+        await set(ref(database, "config/loginMode"), mode);
+        writeAuditLog(`Changed login gateway style to: ${mode}`);
+        alert(`Login mode updated to: ${mode}`);
+    });
 
     // 1. Roles & Timed Sanctions
     document.getElementById("saveRoleBtn").addEventListener("click", async () => {
@@ -1758,14 +1856,7 @@
         }
     });
 
-    // 4. Security, Passcode Mode & Subnet Blocking
-    document.getElementById("saveLoginModeBtn").addEventListener("click", async () => {
-        const mode = document.getElementById("loginModeSelect").value;
-        await set(ref(database, "config/loginMode"), mode);
-        writeAuditLog(`Updated login passcode requirement mode to '${mode}'`);
-        alert("Passcode login mode updated!");
-    });
-
+    // 4. Security & Subnet Blocking
     document.getElementById("blockSubnetBtn").addEventListener("click", async () => {
         const sub = document.getElementById("subnetInput").value.trim();
         if (sub) {
@@ -1880,8 +1971,8 @@
                 const user = data[key];
                 const tr = document.createElement("tr");
 
-                const isBanned = user.banned || (user.tempBanUntil && user.tempBanUntil > Date.now());
-                const isMuted = user.muted || (user.tempMuteUntil && user.tempMuteUntil > Date.now());
+                const isBanned = user.banned || false;
+                const isMuted = user.muted || false;
                 const role = user.role || "User";
 
                 const statusHtml = isBanned ? "<span style='color:#f85149;'>Banned</span>" : (user.online ? "<span style='color:#3fb950;'>Online</span>" : "<span style='color:#8b949e;'>Offline</span>");
@@ -1893,7 +1984,7 @@
                     <td>${statusHtml}</td>
                     <td>
                         <button class="action-sm-btn ${isBanned ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${key}', ${!isBanned})">${isBanned ? 'Unban' : 'Ban'}</button>
-                        <button class="action-sm-btn ${isMuted ? 'unmute-btn' : 'mute-btn'}" onclick="toggleMute('${key}', ${!isMuted})">${isMuted ? 'Unmute' : 'Mute'}</button>
+                        <button class="action-sm-btn mute-btn" onclick="toggleMute('${key}', ${!isMuted})">${isMuted ? 'Unmute' : 'Mute'}</button>
                         <button class="action-sm-btn purge-btn" onclick="purgeUserMessages('${user.username}')">Purge Msgs</button>
                     </td>
                 `;
@@ -1902,25 +1993,13 @@
         });
     }
 
-    // Toggle Ban & Unban Logic (clears timed ban on unban)
     window.toggleBan = async (key, shouldBan) => {
-        if (shouldBan) {
-            await set(ref(database, `users/${key}/banned`), true);
-        } else {
-            await set(ref(database, `users/${key}/banned`), false);
-            await remove(ref(database, `users/${key}/tempBanUntil`));
-        }
+        await set(ref(database, `users/${key}/banned`), shouldBan);
         writeAuditLog(`${shouldBan ? 'Banned' : 'Unbanned'} user key: ${key}`);
     };
 
-    // Toggle Mute & Unmute Logic (clears timed mute on unmute)
     window.toggleMute = async (key, shouldMute) => {
-        if (shouldMute) {
-            await set(ref(database, `users/${key}/muted`), true);
-        } else {
-            await set(ref(database, `users/${key}/muted`), false);
-            await remove(ref(database, `users/${key}/tempMuteUntil`));
-        }
+        await set(ref(database, `users/${key}/muted`), shouldMute);
         writeAuditLog(`${shouldMute ? 'Muted' : 'Unmuted'} user key: ${key}`);
     };
 
