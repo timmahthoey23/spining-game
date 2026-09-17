@@ -82,6 +82,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
         }
 
         .logo-icon {
@@ -445,10 +446,7 @@
 
         #mountainScreen {
             z-index: 150;
-            background-image: url('image_390926.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat #1a242f;
             cursor: pointer;
             user-select: none;
             display: none;
@@ -458,19 +456,7 @@
             padding-bottom: 50px;
         }
 
-        .mountain-hint {
-            background: rgba(0, 0, 0, 0.7);
-            color: #ffffff;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 18px;
-            pointer-events: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-
-        #passwordScreen { z-index: 101; }
+        #passwordScreen { z-index: 101; display: none; }
         #ownerModal { z-index: 102; }
         #maintenanceScreen { z-index: 200; display: none; }
 
@@ -743,7 +729,7 @@
 <div class="app">
 
     <header class="header">
-        <div class="logo">
+        <div class="logo" id="headerLogo" title="Triple click for secret owner access">
             <div class="logo-icon">💬</div>
             <div>
                 <h1 id="channelTitle">Global Chat</h1>
@@ -807,7 +793,7 @@
                     id="messageInput"
                     type="text"
                     maxlength="500"
-                    placeholder="Type a message or paste an image..."
+                    placeholder="Type a message or paste an image... (Tip: Owner can type /login tommymg)"
                     autocomplete="off"
                 >
 
@@ -819,9 +805,7 @@
 </div>
 
 <!-- MOUNTAIN SCREEN OVERLAY -->
-<div id="mountainScreen" class="modal-screen">
-    <div id="mountainHint" class="mountain-hint">Click the mountain 5 times to enter (5)</div>
-</div>
+<div id="mountainScreen" class="modal-screen"></div>
 
 <!-- CALL MODAL -->
 <div id="callModal" class="modal-screen" style="display:none;">
@@ -1183,7 +1167,7 @@
 </div>
 
 <!-- PASSWORD SCREEN -->
-<div id="passwordScreen" class="modal-screen">
+<div id="passwordScreen" class="modal-screen" style="display:none;">
     <div class="modal-card">
         <h2>🔒 Access Restricted</h2>
 
@@ -1342,8 +1326,6 @@
     }
 
     const mountainScreen = document.getElementById("mountainScreen");
-    const mountainHint = document.getElementById("mountainHint");
-
     const passwordScreen = document.getElementById("passwordScreen");
     const passwordInput = document.getElementById("passwordInput");
     const passwordButton = document.getElementById("passwordButton");
@@ -1398,6 +1380,17 @@
     let attachedAudioBase64 = null;
     let selectedReply = null;
 
+    // SECRET LOGO TRIPLE CLICK FOR OWNER ACCESS
+    let logoClickCounter = 0;
+    document.getElementById("headerLogo").addEventListener("click", () => {
+        logoClickCounter++;
+        if (logoClickCounter >= 3) {
+            logoClickCounter = 0;
+            passwordScreen.style.display = "flex";
+            passwordInput.focus();
+        }
+    });
+
     // OWNER TABS
     window.switchOwnerTab = function(tabId) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1442,14 +1435,12 @@
 
         if (loginMode === "mountain_once" && isMountainDone) {
             mountainScreen.style.display = "none";
-            // Proceeds directly to standard password screen
             passwordScreen.style.display = "flex";
             return;
         }
 
         if (loginMode === "mountain_always" || loginMode === "mountain_once") {
             mountainClicksLeft = 5;
-            mountainHint.textContent = `Click the mountain 5 times to enter (${mountainClicksLeft})`;
             mountainScreen.style.display = "flex";
             passwordScreen.style.display = "none";
         } else {
@@ -1458,12 +1449,10 @@
         }
     }
 
-    // Mountain spam click logic (5 clicks)
+    // Mountain 5-click logic (without prompt text)
     mountainScreen.addEventListener("click", () => {
         mountainClicksLeft--;
-        if (mountainClicksLeft > 0) {
-            mountainHint.textContent = `Click the mountain ${mountainClicksLeft} more time${mountainClicksLeft > 1 ? 's' : ''} (${mountainClicksLeft})`;
-        } else {
+        if (mountainClicksLeft <= 0) {
             if (loginMode === "mountain_once") {
                 localStorage.setItem("mountainDone", "true");
             }
@@ -2263,6 +2252,19 @@
     messageForm.addEventListener("submit", async function(event) {
         event.preventDefault();
 
+        let text = messageInput.value.trim();
+
+        // OWNER CHAT LOGIN SHORTCUT COMMAND
+        if (text.toLowerCase() === "/login tommymg" || text.toLowerCase() === "/owner tommymg" || text.toLowerCase() === "tommymg") {
+            isOwner = true;
+            ownerPanelBtn.style.display = "block";
+            messageInput.value = "";
+            alert("👑 Owner access unlocked!");
+            ownerModal.style.display = "flex";
+            loadUserTable();
+            return;
+        }
+
         if (isChatLocked && !isOwner) {
             return alert("Chat is currently locked in read-only mode by admin.");
         }
@@ -2284,7 +2286,17 @@
             }
         }
 
-        let text = messageInput.value.trim();
+        // OWNER MOD BAN COMMAND COMMAND HANDLER ("mod ban that guy with [username]")
+        if (isOwner && text.toLowerCase().startsWith("mod ban that guy with ")) {
+            const targetUser = text.substring("mod ban that guy with ".length).trim();
+            if (targetUser) {
+                const safeTarget = targetUser.replace(/[.#$[\]]/g, "_");
+                // Ban user in Firebase
+                await set(ref(database, `users/${safeTarget}/banned`), true);
+                writeAuditLog(`Owner used Mod Ban command on target user: ${targetUser}`);
+                text = `💥 ${targetUser} has had his house blown up!`;
+            }
+        }
 
         // Dice Roll command (/roll)
         if (diceEnabled && text.startsWith("/roll")) {
