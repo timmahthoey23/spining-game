@@ -174,7 +174,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Banner & Call Styles */
         .call-banner, .pinned-banner, .event-banner {
             background: #5865f2;
             color: white;
@@ -634,6 +633,7 @@
         .ban-btn { background: #da3633; }
         .unban-btn { background: #238636; }
         .mute-btn { background: #d29922; }
+        .unmute-btn { background: #238636; }
         .purge-btn { background: #8b949e; }
 
         .audit-log-box {
@@ -824,7 +824,7 @@
 <div id="maintenanceScreen" class="modal-screen">
     <div class="modal-card">
         <h2>🛠️ Under Maintenance</h2>
-        <p>The site is currently underwent scheduled maintenance. Please check back shortly!</p>
+        <p>The site is currently undergoing scheduled maintenance. Please check back shortly!</p>
     </div>
 </div>
 
@@ -877,14 +877,14 @@
                 </div>
 
                 <div class="admin-section">
-                    <h4>⏱️ Timed Sanctions & Force Rename</h4>
+                    <h4>⏱️ Timed Sanctions & Actions</h4>
                     <b style="font-size:12px; color:#8b949e;">Timed Sanction Duration:</b>
                     <select id="sanctionTimeSelect" class="modal-select">
                         <option value="600">10 Minutes</option>
                         <option value="3600">1 Hour</option>
                         <option value="86400">24 Hours</option>
                     </select>
-                    <div style="display:flex; gap:6px;">
+                    <div style="display:flex; gap:6px; margin-bottom:8px;">
                         <button id="timedBanBtn" class="modal-btn danger-btn">Timed Ban</button>
                         <button id="timedMuteBtn" class="modal-btn" style="background:#d29922;">Timed Mute</button>
                     </div>
@@ -1012,10 +1012,14 @@
         <div id="tab-system" class="tab-content">
             <div class="admin-grid">
                 <div class="admin-section">
-                    <h4>🚫 IP Range & Subnet Blocking</h4>
-                    <input id="subnetInput" class="modal-input" placeholder="e.g. 192.168.1.* or 10.0.*">
-                    <button id="blockSubnetBtn" class="modal-btn danger-btn">Block IP Subnet</button>
-                    <div id="blockedSubnetsList" style="font-size:12px; color:#8b949e; margin-top:8px;"></div>
+                    <h4>🔑 Initial Passcode Settings</h4>
+                    <b style="font-size:12px; color:#8b949e;">Login Requirement Mode:</b>
+                    <select id="loginModeSelect" class="modal-select">
+                        <option value="everytime">Login Every Time (Standard)</option>
+                        <option value="once">One-Time Login (Remember Device)</option>
+                        <option value="disabled">No Login Needed (Bypass Passcode)</option>
+                    </select>
+                    <button id="saveLoginModeBtn" class="modal-btn">Save Passcode Mode</button>
                 </div>
 
                 <div class="admin-section">
@@ -1041,6 +1045,15 @@
                 </div>
 
                 <div class="admin-section">
+                    <h4>🚫 IP Range & Subnet Blocking</h4>
+                    <input id="subnetInput" class="modal-input" placeholder="e.g. 192.168.1.* or 10.0.*">
+                    <button id="blockSubnetBtn" class="modal-btn danger-btn">Block IP Subnet</button>
+                    <div id="blockedSubnetsList" style="font-size:12px; color:#8b949e; margin-top:8px;"></div>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-section">
                     <h4>💾 Database Backup & Restore</h4>
                     <div style="display:flex; gap:6px;">
                         <button id="backupDbBtn" class="modal-btn" style="background:#238636;">Download Backup</button>
@@ -1048,12 +1061,12 @@
                         <button id="restoreDbBtn" class="modal-btn" style="background:#d29922;">Restore Backup</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="admin-section">
-                <h4>📱 Active Sessions & Danger Zone</h4>
-                <button id="kickAllSessionsBtn" class="modal-btn danger-btn" style="margin-bottom:8px;">Force Log-Out All Devices Across Room</button>
-                <button id="clearChatBtn" class="modal-btn danger-btn">🗑️ Clear Entire Global Chat History</button>
+                <div class="admin-section">
+                    <h4>📱 Active Sessions & Danger Zone</h4>
+                    <button id="kickAllSessionsBtn" class="modal-btn danger-btn" style="margin-bottom:8px;">Force Log-Out All Devices Across Room</button>
+                    <button id="clearChatBtn" class="modal-btn danger-btn">🗑️ Clear Entire Global Chat History</button>
+                </div>
             </div>
         </div>
 
@@ -1254,6 +1267,7 @@
     let userIp = "Fetching...";
     let notificationsEnabled = localStorage.getItem("notificationsEnabled") === "true";
     let customPasscode = null;
+    let loginMode = "everytime"; // options: "everytime", "once", "disabled"
     let isChatLocked = false;
     let slowmodeDelay = 0;
     let bannedWords = [];
@@ -1328,6 +1342,7 @@
     const userTableBody = document.getElementById("userTableBody");
 
     const slowmodeSelect = document.getElementById("slowmodeSelect");
+    const loginModeSelect = document.getElementById("loginModeSelect");
     const bannedWordsInput = document.getElementById("bannedWordsInput");
     const saveFilterBtn = document.getElementById("saveFilterBtn");
 
@@ -1363,6 +1378,7 @@
     onValue(configRef, (snapshot) => {
         const cfg = snapshot.val() || {};
         customPasscode = cfg.passcode || null;
+        loginMode = cfg.loginMode || "everytime";
         isChatLocked = cfg.locked || false;
         slowmodeDelay = parseInt(cfg.slowmode || 0);
         bannedWords = cfg.bannedWords ? cfg.bannedWords.split(",").map(w => w.trim().toLowerCase()) : [];
@@ -1374,7 +1390,17 @@
         diceEnabled = cfg.diceEnabled !== false;
 
         if (slowmodeSelect) slowmodeSelect.value = slowmodeDelay;
+        if (loginModeSelect) loginModeSelect.value = loginMode;
         if (bannedWordsInput) bannedWordsInput.value = cfg.bannedWords || "";
+
+        // Login Mode bypass checks
+        if (loginMode === "disabled") {
+            passwordScreen.style.display = "none";
+            if (!username) usernameScreen.style.display = "flex";
+        } else if (loginMode === "once" && localStorage.getItem("passcodeUnlocked") === "true") {
+            passwordScreen.style.display = "none";
+            if (!username) usernameScreen.style.display = "flex";
+        }
 
         // Maintenance Mode handling
         if (maintenanceMode && !isOwner) {
@@ -1440,7 +1466,6 @@
         const subList = Object.keys(subnets).join(", ");
         document.getElementById("blockedSubnetsList").textContent = "Blocked Subnets: " + (subList || "None");
         
-        // Check if current user IP is blocked
         if (!isOwner && userIp !== "Fetching...") {
             Object.keys(subnets).forEach(sub => {
                 const prefix = sub.replace("*", "");
@@ -1492,6 +1517,9 @@
             registerUserSession();
             updateProfileUI();
         } else if (inputHash === USER_HASH || inputVal === "1234" || (customPasscode && inputVal === customPasscode)) {
+            if (loginMode === "once") {
+                localStorage.setItem("passcodeUnlocked", "true");
+            }
             passwordScreen.style.display = "none";
             if (!username) usernameScreen.style.display = "flex";
             registerUserSession();
@@ -1549,8 +1577,8 @@
             total = entries.length;
             entries.forEach(u => {
                 if (u.online) count++;
-                if (u.banned) bannedCount++;
-                if (u.muted) mutedCount++;
+                if (u.banned || (u.tempBanUntil && u.tempBanUntil > Date.now())) bannedCount++;
+                if (u.muted || (u.tempMuteUntil && u.tempMuteUntil > Date.now())) mutedCount++;
             });
         }
 
@@ -1730,7 +1758,14 @@
         }
     });
 
-    // 4. Security & Subnet Blocking
+    // 4. Security, Passcode Mode & Subnet Blocking
+    document.getElementById("saveLoginModeBtn").addEventListener("click", async () => {
+        const mode = document.getElementById("loginModeSelect").value;
+        await set(ref(database, "config/loginMode"), mode);
+        writeAuditLog(`Updated login passcode requirement mode to '${mode}'`);
+        alert("Passcode login mode updated!");
+    });
+
     document.getElementById("blockSubnetBtn").addEventListener("click", async () => {
         const sub = document.getElementById("subnetInput").value.trim();
         if (sub) {
@@ -1845,8 +1880,8 @@
                 const user = data[key];
                 const tr = document.createElement("tr");
 
-                const isBanned = user.banned || false;
-                const isMuted = user.muted || false;
+                const isBanned = user.banned || (user.tempBanUntil && user.tempBanUntil > Date.now());
+                const isMuted = user.muted || (user.tempMuteUntil && user.tempMuteUntil > Date.now());
                 const role = user.role || "User";
 
                 const statusHtml = isBanned ? "<span style='color:#f85149;'>Banned</span>" : (user.online ? "<span style='color:#3fb950;'>Online</span>" : "<span style='color:#8b949e;'>Offline</span>");
@@ -1858,7 +1893,7 @@
                     <td>${statusHtml}</td>
                     <td>
                         <button class="action-sm-btn ${isBanned ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${key}', ${!isBanned})">${isBanned ? 'Unban' : 'Ban'}</button>
-                        <button class="action-sm-btn mute-btn" onclick="toggleMute('${key}', ${!isMuted})">${isMuted ? 'Unmute' : 'Mute'}</button>
+                        <button class="action-sm-btn ${isMuted ? 'unmute-btn' : 'mute-btn'}" onclick="toggleMute('${key}', ${!isMuted})">${isMuted ? 'Unmute' : 'Mute'}</button>
                         <button class="action-sm-btn purge-btn" onclick="purgeUserMessages('${user.username}')">Purge Msgs</button>
                     </td>
                 `;
@@ -1867,13 +1902,25 @@
         });
     }
 
+    // Toggle Ban & Unban Logic (clears timed ban on unban)
     window.toggleBan = async (key, shouldBan) => {
-        await set(ref(database, `users/${key}/banned`), shouldBan);
+        if (shouldBan) {
+            await set(ref(database, `users/${key}/banned`), true);
+        } else {
+            await set(ref(database, `users/${key}/banned`), false);
+            await remove(ref(database, `users/${key}/tempBanUntil`));
+        }
         writeAuditLog(`${shouldBan ? 'Banned' : 'Unbanned'} user key: ${key}`);
     };
 
+    // Toggle Mute & Unmute Logic (clears timed mute on unmute)
     window.toggleMute = async (key, shouldMute) => {
-        await set(ref(database, `users/${key}/muted`), shouldMute);
+        if (shouldMute) {
+            await set(ref(database, `users/${key}/muted`), true);
+        } else {
+            await set(ref(database, `users/${key}/muted`), false);
+            await remove(ref(database, `users/${key}/tempMuteUntil`));
+        }
         writeAuditLog(`${shouldMute ? 'Muted' : 'Unmuted'} user key: ${key}`);
     };
 
